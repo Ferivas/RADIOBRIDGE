@@ -10,3 +10,8 @@ SCH/History/PCB_RADIOBRIDGE_2022-01-21.~(3).pcbdoc.Zip
 SCH/History/PCB_RADIOBRIDGE_2022-01-22.~(1).pcbdoc.Zip
 SCH/PCB_RADIOBRIDGE_2022-01-21.pcbdoc
 SCH/PCB_RADIOBRIDGE_2022-01-22.pcbdoc
+*.bm
+*.cfg
+*.dbg
+*.obj
+*.rpt

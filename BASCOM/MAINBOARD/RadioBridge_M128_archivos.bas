@@ -31,7 +31,7 @@ Dim Tmpb As Byte
 Dim Tmpb2 As Byte
 Dim Tmpb3 As Byte
 Dim Tmpb4 As Byte
-Dim Tmpcntrsta As Byte
+'Dim Tmpcntrsta As Byte
 
 Dim Tmps As Single
 Dim Bs1 As Byte At Tmps Overlay
@@ -47,7 +47,8 @@ Dim J As Byte
 Dim K As Byte
 Dim Tmpw As Word
 Dim Tmpw2 As Word
-Dim Tmpdw As Dword
+'Dim Tmpdw As Dword
+Dim Enabug As Byte
 
 Dim Dispbug As Byte
 Dim Inirst As Bit
@@ -56,13 +57,13 @@ Dim Cntrrst As Word
 Dim Cmdtmp As String * 6
 Dim Atsnd As String * 200
 Dim Cmderr As Byte
-Dim Tmpstr8 As String * 16
+'Dim Tmpstr8 As String * 16
 Dim Tmpstr52 As String * 52
 
 Dim Trqststa As Word                                        'Tiempo de consulta a estaciones
 Dim Trqststaeep As Eram Word
 Dim Cntrseg As Byte
-Dim Cntrmin As Byte
+'Dim Cntrmin As Byte
 Dim Tani As Byte
 Dim Numani As Word
 
@@ -144,6 +145,7 @@ Dim Newadc As Bit
 
 Dim Vbat As Single
 Dim Vps As Single
+Dim Vdc3 As Single
 
 Dim Vbat1 As Byte At Vbat Overlay
 Dim Vbat2 As Byte At Vbat + 1 Overlay
@@ -280,7 +282,7 @@ Int_timer0:
       'Reset Inirst
       Set Pinbug
       Incr Cntrrst
-      Cntrrst = Cntrrst Mod 340
+      Cntrrst = Cntrrst Mod 500
       If Cntrrst = 0 Then
          Ptrrxdtmf = 0
          Reset Inirst
@@ -299,7 +301,8 @@ Pcint_int:
    Else
       Reset Ledrx
    End If
-   If Dv = 1 And Regb.0 = 1 Then
+   'If Dv = 1 And Regb.0 = 1 Then
+   If Dv = 1 Then
       Tonodtmf = Pind
       Shift Tonodtmf , Right , 4
 '      Print #1 , "T=" ; Hex(tonodtmf)
@@ -311,6 +314,9 @@ Pcint_int:
       End If
       'Set Newdv
       If Ptrrxdtmf = 0 Then
+         Set Newdv
+      End If
+      If Ptrrxdtmf > 14 Then
          Set Newdv
       End If
    End If
@@ -450,11 +456,11 @@ Sub Txdtmf()
       Set Ledtx
       Reset Ce
 '      Call Espera(8)
-      Call Espera(16)
+      Call Espera(8)
       Set Ce
       Reset Ledtx
 '      Call Espera(4)
-      Call Espera(8)
+      Call Espera(4)
 
    Next
 
@@ -656,6 +662,7 @@ Sub Leeradc()
       Next
       Vbat = Adcval(1)
       Vps = Adcval(2)
+      Vdc3 = Adcval(3)
 
    End If
 
@@ -906,7 +913,7 @@ Sub Procser()
             Adckeep(1) = 0.05494499
             Adckeep(2) = 0.05494499
             Adckeep(3) = 0.05494499
-            Numestacioneep = 2
+            Numestacioneep = 14
             Cntrtxeep = 0
             Cntrcrcokeep = 0
             Cntrcrcbadeep = 0
@@ -964,6 +971,8 @@ Sub Procser()
                      Reset Rele
                   End If
                   Atsnd = "rele=" + Str(tmpb)
+                  Wait 3
+                  print #1, "Fin rel"
 
                Else
                   Cmderr = 5
@@ -971,6 +980,23 @@ Sub Procser()
             Else
                Cmderr = 4
             End If
+
+         Case "SETBUG"
+            If Numpar = 2 Then
+               Cmderr = 0
+               Enabug = Val(cmdsplit(2))
+               Atsnd = "Se config ENABUG=" + Str(enabug)
+            Else
+               Cmderr = 4
+            End If
+
+         Case "LEEBUG"
+            Cmderr = 0
+            Atsnd = "ENABUG=" + Str(enabug)
+
+         Case "LEEVDC"
+            Cmderr = 0
+            Atsnd = "Vbat=" + Fusing(vbat , "#.#") + ", Vps=" + Fusing(vps , "#.#") + ", Vdc3=" + Fusing(vdc3 , "#.#")
 
          Case Else
             Cmderr = 1

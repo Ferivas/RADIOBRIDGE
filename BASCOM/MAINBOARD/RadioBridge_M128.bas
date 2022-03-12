@@ -19,7 +19,7 @@
 ' Test    - El Master envia comando de configuracion de Test de Audio y DRVLED
 ' Naranja - El Master envia comando de configuracion de estado de alarma
 
-$version 0 , 1 , 249
+$version 0 , 1 , 272
 $regfile = "m128def.dat"
 $crystal = 16000000
 $baud = 9600
@@ -370,8 +370,9 @@ Do
          Valsta = 7
 
       End If
-
-      Print #1 , Ptrani ; "," ; Valsta ; "," ; "OFF=" ; Modooff
+      If Enabug = 1 Then
+         Print #1 , Ptrani ; "," ; Valsta ; "," ; "OFF=" ; Modooff
+      End If
       Call Outsubsta(valsta)
    End If
 

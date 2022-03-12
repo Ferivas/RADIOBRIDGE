@@ -253,17 +253,17 @@ Return
 Serial1bytereceived:
    Load Timer1 , Load_timer
    Start Timer1
-   Set Pinbug2
+  ' Set Pinbug2
    Toggle Ledmdb
 '   Set Inipol
 Return
 
 Modbus_space:
-   Set Pinbug
+   'Set Pinbug
    Stop Timer1
-   Reset Pinbug2
+   'Reset Pinbug2
    Call Modbus_exec
-   Reset Pinbug
+   'Reset Pinbug
 Return
 
 '*******************************************************************************

@@ -19,7 +19,7 @@
 ' Test    - El Master envia comando de configuracion de Test de Audio y DRVLED
 ' Naranja - El Master envia comando de configuracion de estado de alarma
 
-$version 0 , 1 , 272
+$version 0 , 1 , 274
 $regfile = "m128def.dat"
 $crystal = 16000000
 $baud = 9600
@@ -246,13 +246,13 @@ Do
                Print #1,
                Print #1 , "Trama DTMF"
                Print #1 , "RXDTMF";
-               Print #2 , "$RXDTMF";
+               'Print #2 , "$RXDTMF";
                For J = 1 To 30
                   Print #1 , "," ; Hex(tramatxdtmf(j)) ;
-                  Print #2 , "," ; Hex(tramatxdtmf(j)) ;
+                  'Print #2 , "," ; Hex(tramatxdtmf(j)) ;
                Next
                Print #1,
-               Print #2,
+               'Print #2,
                Call Espera(200)
                Call Txdtmf()
             Else
@@ -338,6 +338,7 @@ Do
       Reset Newdrv
       If Drvaudiook = 0 Then
          Print #1 , "$DRVAUD," ; Status
+         Print #2 , "$DRVAUD," ; Status
          Incr Cntrsubsta
          Cntrsubsta = Cntrsubsta Mod 10
          If Cntrsubsta = 0 Then

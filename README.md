@@ -34,6 +34,15 @@ Una vez programada la tarjeta el número de estación se puede configurar por el
 
 *$setsta,Numestacion*
 
+## PRUEBAS ESCLAVOS DESDE MASTER
+Desde el Hterm enviar el siguiente comando a 9600,8,N,1
+
+*$tststa,Numestacion,1,10*
+
+donde Numestacion puede variar de 1 a 9 
+
+
+
 El número de estación actual se puede consultar con <br>
 
 *$leesta*

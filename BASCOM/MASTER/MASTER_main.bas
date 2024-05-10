@@ -27,7 +27,7 @@
 
 
 
-$version 0 , 1 , 103
+$version 0 , 1 , 120
 $regfile = "m128def.dat"
 $crystal = 16000000
 $baud = 9600
@@ -36,7 +36,7 @@ $baud1 = 9600
 $hwstack = 128
 $swstack = 128
 $framesize = 128
-$projecttime = 24
+$projecttime = 49
 
 
 'Declaracion de constantes
@@ -201,7 +201,9 @@ Do
 '            Modooff = 0
             Modooffant = Modooff
             Estado_led = 1
-            Print #1 , "$SETMOP,1"
+            Tmpstr52 = "$SETMOP,1"
+            Print #1 , Tmpstr52
+            Print #2 , Tmpstr52
          End If
       Else
          Estado_led = 11
@@ -211,7 +213,9 @@ Do
             'Modooff = 1
             Modooffant = Modooff
             Estado_led = 11
-            Print #1 , "$SETMOP,0"
+            Tmpstr52 = "$SETMOP,0"
+            Print #1 , Tmpstr52
+            Print #2 , Tmpstr52
          End If
       End If
 
@@ -219,9 +223,13 @@ Do
       Cntrmodooff = Cntrmodooff Mod 300
       If Cntrmodooff = 0 Then
          If Modooff = 1 Then
-           Print #1 , "$SETMOP,0"
+            Tmpstr52 = "$SETMOP,0"
+            Print #1 , Tmpstr52
+            Print #2 , Tmpstr52
          Else
-           Print #1 , "$SETMOP,1"
+            Tmpstr52 = "$SETMOP,1"
+            Print #1 , Tmpstr52
+            Print #2 , Tmpstr52
          End If
 
       End If
@@ -238,7 +246,10 @@ Do
       Print #1 , Time$ ; ";" ; Date$
       Input_registers_table(11) = Cntrestaciones
       Input_registers_table(12) = Status
-      Print #1 , "$SETIPR," ; "12" ; "," ; Hex(input_registers_table(12))
+      'Print #1 , "$SETIPR," ; "12" ; "," ; Hex(input_registers_table(12))
+      Tmpstr52 = "$SETIPR," + "12" + "," + Hex(input_registers_table(12))
+      Print #1 , Tmpstr52
+      Print #2 , Tmpstr52
 
       If Cntrestaciones = Numsta Then
          Reset Newtxper
@@ -247,11 +258,17 @@ Do
          Tmps = Cntrtx
          Tmpw = Makeint(bs3 , Bs4)
          Input_registers_table(1) = Tmpw
-         Print #1 , "$SETIPR," ; "1" ; "," ; Hex(input_registers_table(1))
+         'Print #1 , "$SETIPR," ; "1" ; "," ; Hex(input_registers_table(1))
+         Tmpstr52 = "$SETIPR," + "1" + "," + Hex(input_registers_table(1))
+         Print #1 , Tmpstr52
+         Print #2 , Tmpstr52
          Tmpw = Makeint(bs1 , Bs2)
          Incr Ptrhdr
          Input_registers_table(2) = Tmpw
-         Print #1 , "$SETIPR," ; "2" ; "," ; Hex(input_registers_table(2))
+         'Print #1 , "$SETIPR," ; "2" ; "," ; Hex(input_registers_table(2))
+         Tmpstr52 = "$SETIPR," + "2" + "," + Hex(input_registers_table(2))
+         Print #1 , Tmpstr52
+         Print #2 , Tmpstr52
       End If
 
       Call Gentrama()
@@ -270,7 +287,7 @@ Do
       Call Txdtmf()
 
       Print #1 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; Cntrestaciones ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
-
+      Print #2 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; Cntrestaciones ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
    'Else
     '  If Inibroadcast = 1 Then
      '    Print #1 , " NO TX periodica por Broadcast"
@@ -310,6 +327,7 @@ Do
          Incr Cntrtx
          Cntrtxeep = Cntrtx
          Print #1 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; Statst ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
+         Print #2 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; Statst ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
 
    End If
 
@@ -385,7 +403,10 @@ Do
           Incr Ptrbhdr
           Input_registers_table(ptrhdr).ptrbhdr = Tmphdr.3
           Print #1 , "INPUTreg(" ; Ptrhdr ; ")=" ; Hex(input_registers_table(ptrhdr))
-          Print #1 , "$SETIPR," ; Ptrhdr ; "," ; Hex(input_registers_table(ptrhdr))
+          'Print #1 , "$SETIPR," ; Ptrhdr ; "," ; Hex(input_registers_table(ptrhdr))
+          Tmpstr52 = "$SETIPR," + Str(ptrhdr) + "," + Hex(input_registers_table(ptrhdr))
+          Print #1 , Tmpstr52
+          Print #2 , Tmpstr52
 
           Bs1 = Tbl_rxhex(2)
           Bs2 = Tbl_rxhex(3)
@@ -400,11 +421,19 @@ Do
 
           Tmpw = Makeint(bs3 , Bs4)
           Holding_registers_table(ptrhdr) = Tmpw
-          Print #1 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
+          'Print #1 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
+          Tmpstr52 = "$SETHDR," + Str(ptrhdr) + "," + Hex(holding_registers_table(ptrhdr))
+          Print #1 , Tmpstr52
+          Print #2 , Tmpstr52
+
           Tmpw = Makeint(bs1 , Bs2)
           Incr Ptrhdr
           Holding_registers_table(ptrhdr) = Tmpw
-          Print #1 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
+          'Print #1 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
+          Tmpstr52 = "$SETHDR," + Str(ptrhdr) + "," + Hex(holding_registers_table(ptrhdr))
+          Print #1 , Tmpstr52
+          Print #2 , Tmpstr52
+
 
           Print #1 , "Cntr_tx=" ; Tbl_ctx(tmpb) ; "," ; Hex(tmpdw)
 
@@ -424,10 +453,12 @@ Do
           Tmpw = Makeint(bs3 , Bs4)
           Holding_registers_table(ptrhdr) = Tmpw
           Print #1 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
+          Print #2 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
           Tmpw = Makeint(bs1 , Bs2)
           Incr Ptrhdr
           Holding_registers_table(ptrhdr) = Tmpw
           Print #1 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
+          Print #2 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
 
           'Atsnd = Atsnd + Fusing(tmps , "#.##") + ","
           Print #1 , "Vbat=" ; Tmps ; "," ; Hex(tmps)
@@ -446,10 +477,12 @@ Do
           Tmpw = Makeint(bs3 , Bs4)
           Holding_registers_table(ptrhdr) = Tmpw
           Print #1 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
+          Print #2 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
           Tmpw = Makeint(bs1 , Bs2)
           Incr Ptrhdr
           Holding_registers_table(ptrhdr) = Tmpw
           Print #1 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
+          Print #2 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
 
 
           Tbl_stain(tmpb) = Tbl_rxhex(6)
@@ -487,6 +520,7 @@ Do
 
           Print #1 , "INPUTreg(" ; Ptrhdr ; ")=" ; Hex(input_registers_table(ptrhdr))
           Print #1 , "$SETIPR," ; Ptrhdr ; "," ; Hex(input_registers_table(ptrhdr))
+          Print #2 , "$SETIPR," ; Ptrhdr ; "," ; Hex(input_registers_table(ptrhdr))
 
          Tmps = Cntrtx
 
@@ -494,10 +528,12 @@ Do
          Tmpw = Makeint(bs3 , Bs4)
          Input_registers_table(1) = Tmpw
          Print #1 , "$SETIPR," ; "1" ; "," ; Hex(input_registers_table(1))
+         Print #2 , "$SETIPR," ; "1" ; "," ; Hex(input_registers_table(1))
          Tmpw = Makeint(bs1 , Bs2)
          Incr Ptrhdr
          Input_registers_table(2) = Tmpw
          Print #1 , "$SETIPR," ; "2" ; "," ; Hex(input_registers_table(2))
+         Print #2 , "$SETIPR," ; "2" ; "," ; Hex(input_registers_table(2))
 
 
 
@@ -522,6 +558,7 @@ Do
          Print #1 , Time$ ; ";" ; Date$
          Input_registers_table(12) = Status
          Print #1 , "$SETIPR," ; "12" ; "," ; Hex(input_registers_table(12))
+         Print #2 , "$SETIPR," ; "12" ; "," ; Hex(input_registers_table(12))
          Tmpcntrsta = Cntrestaciones
          Cntrestaciones = &H0F
          Call Gentrama()
@@ -551,6 +588,7 @@ Do
          Incr Cntrtx
          Cntrtxeep = Cntrtx
          Print #1 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; "15" ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
+         Print #2 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; "15" ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
       End If
    End If
 
@@ -564,6 +602,7 @@ Do
          Cntrestaciones = &H0E
          Input_registers_table(12) = Status
          Print #1 , "$SETIPR," ; "12" ; "," ; Hex(input_registers_table(12))
+         Print #2 , "$SETIPR," ; "12" ; "," ; Hex(input_registers_table(12))
          Call Gentrama()
          Print #1 , "Trama HEX"
          For J = 1 To 10
@@ -591,6 +630,7 @@ Do
          Incr Cntrtx
          Cntrtxeep = Cntrtx
          Print #1 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; "14" ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
+         Print #2 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; "14" ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
       End If
    End If
 
@@ -602,6 +642,7 @@ Do
          Print #1 , Time$ ; ";" ; Date$
          Input_registers_table(12) = Status
          Print #1 , "$SETIPR," ; "12" ; "," ; Hex(input_registers_table(12))
+         Print #2 , "$SETIPR," ; "12" ; "," ; Hex(input_registers_table(12))
 
          Tmpcntrsta = Cntrestaciones
 
@@ -641,6 +682,7 @@ Do
          Incr Cntrtx
          Cntrtxeep = Cntrtx
          Print #1 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; Tmpstr8 ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
+         Print #2 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; Tmpstr8 ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
       End If
    End If
 
@@ -654,31 +696,37 @@ Do
          J = 13
          Input_registers_table(j) = Vbat1
          Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+         Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
          J = 14
          Input_registers_table(j) = Vbat2
          Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+         Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
          J = 15
          Input_registers_table(j) = Vbat3
          Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+         Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
          J = 16
          Input_registers_table(j) = Vbat4
          Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+         Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
 
          Print #1 , "VPS=" ; Vps
          J = 17
          Input_registers_table(j) = Vps1
          Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+         Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
          J = 18
          Input_registers_table(j) = Vps2
          Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+         Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
          J = 19
          Input_registers_table(j) = Vps3
          Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+         Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
          J = 20
          Input_registers_table(j) = Vps4
          Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
-
-
+         Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
       End If
    End If
 

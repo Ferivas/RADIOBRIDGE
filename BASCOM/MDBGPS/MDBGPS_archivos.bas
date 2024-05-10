@@ -788,6 +788,26 @@ Sub Procser()
             Set Inileerhr
             Atsnd = "Leer HDR"
 
+         Case "SETGPS"
+            If Numpar = 2 Then
+               Tmpb = Val(cmdsplit(2))
+               If Tmpb < 2 Then
+                  Cmderr = 0
+                  If Tmpb = 1 Then
+                     Set Enagps
+                  Else
+                     Reset Enagps
+                  End If
+                  Atsnd = "Enagps=" + Str(tmpb)
+
+               Else
+                  Cmderr = 5
+               End If
+            Else
+               Cmderr = 4
+            End If
+
+
           Case Else
             Cmderr = 1
 

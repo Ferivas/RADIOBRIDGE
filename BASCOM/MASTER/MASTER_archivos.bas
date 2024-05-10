@@ -460,7 +460,7 @@ Reset Ptt
 Set Ce
 'Reset Enatx
 Statusrx = 1
-Print #1 , "SAT"
+Print #1 , "SAT MASTER 2024"
 Print #1 , Version(1)
 Print #1 , Version(2)
 Print #1 , Version(3)
@@ -707,6 +707,9 @@ Sub Leersta()
          Lecsta.1 = D1
       End If
    End If
+
+   Lecsta.0 = Lecsta.0 Xor 1
+   Lecsta.1 = Lecsta.1 Xor 1
 
    Select Case Status
       Case 1:                                               'Normal
@@ -1174,7 +1177,7 @@ Sub Procser()
                Cmderr = 4
             End If
 
-         Case "LEECLK"
+         Case "SISCLK"
             Cmderr = 0
             Tmpstr52 = Time$
             'Print #1 , Tmpstr52

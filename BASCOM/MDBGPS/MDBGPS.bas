@@ -19,7 +19,7 @@
 ' Test    - El Master envia comando de configuracion de Test de Audio y DRVLED
 ' Naranja - El Master envia comando de configuracion de estado de alarma
 
-$version 0 , 1 , 59
+$version 0 , 1 , 66
 $regfile = "m1284pdef.dat"
 $crystal = 16000000
 $baud = 9600
@@ -28,7 +28,7 @@ $baud1 = 9600
 $hwstack = 128
 $swstack = 128
 $framesize = 128
-$projecttime = 26
+$projecttime = 31
 
 
 'Declaracion de constantes
@@ -197,5 +197,12 @@ Do
       Call Procser()
    End If
 
+   If Inileerhr = 1 Then
+      Reset Inileerhr
+      For J = 1 To 72
+         Print #1 , J ; "," ; Hex(holding_registers_table(j))
+      Next
+
+   End If
 
 Loop

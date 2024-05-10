@@ -41,9 +41,15 @@ Desde el Hterm enviar el siguiente comando a 9600,8,N,1
 
 donde Numestacion puede variar de 1 a 9 
 
-
-
 El número de estación actual se puede consultar con <br>
 
 *$leesta*
 
+## DRVLED SAT
+Se fabrico tarjeta en JLCPCB. se encontró que la posición del conector de temperatura y GPS estaban intercambiados por lo que fue necesario hacer los siguientes cambios:
+* Remover R5
+* Mover la R13 para desconectarla del pad inferior y unir el mismo al pin 2 de CN2
+* Cortar la pista que llega al pin 2 de CN2
+* Unir el extremo derecho de SB2 al pin 3 del conector CN4
+
+  

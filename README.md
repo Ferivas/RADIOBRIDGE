@@ -1,4 +1,4 @@
-# RADIOBRIDGE
+ # RADIOBRIDGE
 Documentación RadioBridge 
 
 ## BUGS HARDWARE
@@ -57,3 +57,8 @@ Los cambios se muestran en las dos figuras siguientes:
 <img width="1000" alt="Bugs DRVLED " src="https://github.com/Ferivas/RADIOBRIDGE/blob/main/DOCS/DRVLED_BUGHW1.jpg">
 
 <img width="1000" alt="Bugs DRVLED 2" src="https://github.com/Ferivas/RADIOBRIDGE/blob/main/DOCS/DRVLED_BUGHW2.jpg">
+
+## PROGRAMAMCION CON AVRDUDE
+Si se graba el bootloader URboot en los ATmega, se puede programarlos con un Raspberry donde se instalo avrdude utilizando esta línea de comando
+
+*avrdude -p m1284p -c arduino -P /dev/ttyUSB0 -b 57600 -F -D -U flash:w:MBDGPS.hex -v*

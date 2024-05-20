@@ -33,25 +33,25 @@ Config Pwrsd = Output
 'Config Pinbug2 = Output
 
 
-'Staout Alias Portb.2
-'Config Staout = Output
+Staout Alias Portb.2
+Config Staout = Output
 
-Sta0 Alias Pind.4
+Sta0 Alias Pina.0
 Config Sta0 = Input
-Sta1 Alias Pind.5
+Sta1 Alias Pina.1
 Config Sta1 = Input
-Sta2 Alias Pind.6
+Sta2 Alias Pina.2
 Config Sta2 = Input
-Sta3 Alias Pind.7
+Sta3 Alias Pinb.2
 Config Sta3 = Input
 
-Set Portd.4
-Set Portd.5
-Set Portd.6
-Set Portd.7
+Set Porta.0
+Set Porta.1
+Set Porta.2
+Set Portb.2
 
 
-Config 1wire = Portc.4
+Config 1wire = Portc.0
 
 
 
@@ -80,25 +80,25 @@ Config Sela = Output
 Selb Alias Portb.1
 Config Selb = Output
 
-Sck Alias Portb.3
+Sck Alias Portc.5
 Config Sck = Output
 
 
-Datos Alias Portb.2
+Datos Alias Portc.4
 Config Datos = Output
 
 
-Lena2 Alias Porta.0
-Config Lena2 = Output
-
-Lena Alias Porta.1
+Lena Alias Portd.5
 Config Lena = Output
 
-Oena2 Alias Porta.2
-Config Oena2 = Output
+Lena2 Alias Portd.4
+Config Lena2 = Output
 
-Oena Alias Porta.3
+Oena Alias Portd.7
 Config Oena = Output
+
+Oena2 Alias Portd.6
+Config Oena2 = Output
 
 
 'Configuración de Interrupciones

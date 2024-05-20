@@ -21,7 +21,18 @@ Declare Sub Rxdtmf()                                        'Recibe tonos DTMF
 Declare Sub Txdtmf()                                        'Transmite tonos DTMF
 Declare Sub Leersta()
 Declare Sub Leeradc()
-
+Declare Sub Defaultvalues()
+Declare Sub Procgps()
+Declare Sub Procdtmf()
+Declare Sub Proctest()
+Declare Sub Procmodo()
+Declare Sub Txslaves()
+Declare Sub Txalerta()
+Declare Sub Txtest()
+Declare Sub Txnormal()
+Declare Sub Procmodbusreg()
+Declare Sub Vertout()
+Declare Sub Vercfg()
 
 '*******************************************************************************
 'Declaracion de variables
@@ -63,7 +74,7 @@ Dim Statusrx As Byte
 dim Inivariables as bit
 
 
-Dim J As Byte
+Dim J As Byte , Jt As Byte , Kt As Byte
 Dim Tmpw As Word
 
 Dim Tmpdw As Dword
@@ -112,6 +123,8 @@ Dim Tbl_staout(numsta) As Byte                              ' Almacena estado de
 
 Dim Tbl_status(numsta) As Byte                              ' Almacena estado de las estaciones (estatus y errores)
 Dim Tbl_ctx(numsta) As Dword
+Dim Tbl_cntrtout(numsta) As Word                            'Contador Timeout estaciones
+
 
 Dim Status As Byte                                          'Almacena estado
 Dim Statusant As Byte
@@ -137,7 +150,6 @@ Dim D1ant As Bit
 
 
 'Dim Cntrtxbroadcast As Byte
-
 
 
 'Variables TIMER0
@@ -228,6 +240,23 @@ Dim Timefineep As Eram Long
 Dim Volumen As Byte                                         'Para indicar intensidad de la señal de audio en la salida de driver de audio
 Dim Cntrini As Word
 Dim Cntrinieep As Word
+Dim Gpsnew As Bit
+Dim Trygps As Byte
+Dim Hora As String * 10
+Dim Fecha As String * 10
+Dim Gpsproc As String * 160
+
+Dim Tactclk As Long
+Dim Iniactclk As Bit
+Dim Tactclkeep As Eram Long
+Dim Tmptout As Word
+Dim Toptout As Word
+Dim Toptouteep As Eram Word
+
+Dim Cfgokeep As Eram Byte
+Dim Cfgok As Byte
+
+
 '
 
 'Variables SERIAL0
@@ -372,10 +401,17 @@ Int_timer1:
    Set Newadc
    Set Newseg
    'Incr Cntrtxper
+
    Tmpltime = Lsyssec Mod Trqs
    If Tmpltime = 0 Then
       Set Newtxper
       'Incr Cntrtx
+   End If
+
+   Tmpltime = Lsyssec - 900
+   Tmpltime = Tmpltime Mod Tactclk
+   If Tmpltime = 0 Then
+      Set Iniactclk
    End If
 
    If Newtxper = 1 Then
@@ -410,9 +446,6 @@ Setdate:
 Return
 
 Sectic:
-
-
-
    'Tmpltime = Syssec()
    'Incr Tmpltime
    'Time$ = Time(tmpltime)
@@ -432,7 +465,7 @@ Pcint_int:
       Tonodtmf = Pind
       Shift Tonodtmf , Right , 4
 '      Print #1 , "T=" ; Hex(tonodtmf)
-      Toggle Pinbug
+      'Toggle Pinbug
       Incr Ptrrxdtmf
       Tbl_rxdtmf(ptrrxdtmf) = Tonodtmf
       Ptrrxdtmf = Ptrrxdtmf Mod 30
@@ -455,60 +488,60 @@ Return
 ' Inicialización de variables
 '*******************************************************************************
 Sub Inivar()
-Reset Led1
-Reset Ptt
-Set Ce
-'Reset Enatx
-Statusrx = 1
-Print #1 , "SAT MASTER 2024"
-Print #1 , Version(1)
-Print #1 , Version(2)
-Print #1 , Version(3)
-Estado_led = 1
-Status = 1
+   Reset Led1
+   Reset Ptt
+   Set Ce
+   'Reset Enatx
+   Statusrx = 1
+   Print #1 , "SAT MASTER 2024"
+   Print #1 , Version(1)
+   Print #1 , Version(2)
+   Print #1 , Version(3)
+   Estado_led = 1
+   Status = 1
 
-Trqststa = Trqststaeep
-Print #1 , "Tiempo de consulta a estaciones en seg =" ; Trqststa
+   Trqststa = Trqststaeep
+   Print #1 , "Tiempo de consulta a estaciones en seg =" ; Trqststa
 
-Trqsnormal = Trqsnormaleep
-Print #1 , "Tiempo de consulta modo Normal en seg =" ; Trqsnormal
+   Trqsnormal = Trqsnormaleep
+   Print #1 , "Tiempo de consulta modo Normal en seg =" ; Trqsnormal
 
-Trqsalarma = Trqsalarmaeep
-Print #1 , "Tiempo de consulta modo Alarma/test en seg =" ; Trqsalarma
+   Trqsalarma = Trqsalarmaeep
+   Print #1 , "Tiempo de consulta modo Alarma/test en seg =" ; Trqsalarma
 
-Cntrtx = Cntrtxeep
-Print #1 , "Contador de transmisiones =" ; Cntrtx
+   Cntrtx = Cntrtxeep
+   Print #1 , "Contador de transmisiones =" ; Cntrtx
 
-Coil_status_table(1) = 0
-Coil_status_table(2) = 0
-Coil_status_table(3) = 0
-Coil_status_table(4) = 0
-Coil_status_table(5) = 0
+   Coil_status_table(1) = 0
+   Coil_status_table(2) = 0
+   Coil_status_table(3) = 0
+   Coil_status_table(4) = 0
+   Coil_status_table(5) = 0
 
-For Tmpb = 1 To 32
-   Holding_registers_table(tmpb) = 0
-   Input_registers_table(tmpb) = 0
-Next Tmpb
+   For Tmpb = 1 To 32
+      Holding_registers_table(tmpb) = 0
+      Input_registers_table(tmpb) = 0
+   Next Tmpb
 
-Dir_slave = Dir_slave_eep
-Print #1 , "Dir_Slave=" ; Dir_slave
-Trqs = Trqsnormal
+   Dir_slave = Dir_slave_eep
+   Print #1 , "Dir_Slave=" ; Dir_slave
+   Trqs = Trqsnormal
 
-'Set Newtxper
+   'Set Newtxper
 
-Tonotest = 0
+   Tonotest = 0
 
-Cntrcrcok = Cntrcrcokeep
-Print #1 , "CNTRCRCOK=" ; Cntrcrcok
+   Cntrcrcok = Cntrcrcokeep
+   Print #1 , "CNTRCRCOK=" ; Cntrcrcok
 
-Cntrcrcbad = Cntrcrcbadeep
-Print #1 , "CNTRCRCBAD=" ; Cntrcrcbad
+   Cntrcrcbad = Cntrcrcbadeep
+   Print #1 , "CNTRCRCBAD=" ; Cntrcrcbad
 
-Print #1 , "MODO OFF" ; Modooff
+   Print #1 , "MODO OFF" ; Modooff
 
-Cntractremota = Cntractremotaeep
-Print #1 , "Cntractremota=";cntractremota
-Input_registers_table(13) = Cntractremota
+   Cntractremota = Cntractremotaeep
+   Print #1 , "Cntractremota=";cntractremota
+   Input_registers_table(13) = Cntractremota
 
    Horamin = Horamineep
    Print #1 , Time(horamin)
@@ -516,27 +549,61 @@ Input_registers_table(13) = Cntractremota
    Time$ = Time(horamin)
    Date$ = Date(horamin)
 
-Print #1 , "Ultima Act. CLK"
-Print #1 , Date$
-Print #1 , Time$
+   Print #1 , "Ultima Act. CLK"
+   Print #1 , Date$
+   Print #1 , Time$
 
-Cntripadc = Tactadc_10
+   Cntripadc = Tactadc_10
 
-Timeini = Timeinieep
-Timefin = Timefineep
-Print #1 , "TIMEINI=" ; Timeini ; ",";
-Tmpstr52 = Time(timeini)
-Print #1 , Tmpstr52
-Print #1 , "TIMEFIN=" ; Timefin ; ",";
-Tmpstr52 = Time(timefin)
-Print #1 , Tmpstr52
-Modooffant = 99
-Cntrini = Cntrinieep
-Incr Cntrini
-Print #1 , "Cntrini=" ; Cntrini
+   Timeini = Timeinieep
+   Timefin = Timefineep
+   Print #1 , "TIMEINI=" ; Timeini ; ",";
+   Tmpstr52 = Time(timeini)
+   Print #1 , Tmpstr52
+   Print #1 , "TIMEFIN=" ; Timefin ; ",";
+   Tmpstr52 = Time(timefin)
+   Print #1 , Tmpstr52
+   Modooffant = 99
+   Cntrini = Cntrinieep
+   Incr Cntrini
+   Print #1 , "Cntrini=" ; Cntrini
+   Tactclk = Tactclkeep
+   Print #1 , "TactCLK=" ; Tactclk
+   Toptout = Toptouteep
+   Print #1 , "Toptout=" ; Toptout
+
+
 
 End Sub
 
+
+Sub Vercfg()
+
+   Print #1 , "Verificar Config. Inicial"
+   Cfgok = Cfgokeep
+   Tmpb2 = 0
+   Estado_led = 8
+   Do
+      If Sernew = 1 Then                                       'DATOS SERIAL 1
+         Reset Sernew
+         Print #1 , "SER1=" ; Serproc
+         Call Procser()
+         Cfgok = Cfgokeep
+      End If
+      If Newseg = 1 Then
+         Reset Newseg
+         Incr Tmpb
+         Incr Tmpb2
+         Tmpb = Tmpb Mod 10
+         If Tmpb = 0 Then
+            Print #1 , "Ingrese valores de configuracion"
+         End If
+      End If
+   Loop Until Cfgok = 1                                     'Cfgok = 1
+   Print #1 , "CONFIG. INICIAL OK"
+   Estado_led = 1
+
+End Sub
 
 ' Subrutina para generar espera
 '*******************************************************************************
@@ -864,22 +931,18 @@ Sub Procser()
 
          Case "RSTVAR"
             Cmderr = 0
-            Trqststaeep = 10
-            Trqsnormaleep = 600
-            Trqsalarmaeep = 60
-            Cntrtxeep = 0
-            Dir_slave_eep = 1
-            Cntrcrcokeep = 0
-            Cntrcrcbadeep = 0
-            Cntractremotaeep = 0
-            Tmpstr52 = "06:00:00"
-            Timeini = Secofday(tmpstr52)
-            Timeinieep = Timeini
-            Tmpstr52 = "18:00:00"
-            Timefin = Secofday(tmpstr52)
-            Timefineep = Timefin
-            Cntrinieep = 0
+            Call Defaultvalues()
             Set Inivariables
+
+         Case "SETCFG"
+            If Numpar = 2 Then
+               Cfgok = Val(cmdsplit(2))
+               Cfgokeep = Cfgok
+               Cmderr = 0
+               Atsnd = "Se configura CFGOK=" + Str(cfgok)
+            Else
+               Cmderr = 4
+            End If
 
          Case "SETLED"
             If Numpar = 2 Then
@@ -1046,8 +1109,6 @@ Sub Procser()
                Else
                   Cmderr = 5
                End If
-
-
             Else
                Cmderr = 4
             End If
@@ -1188,6 +1249,30 @@ Sub Procser()
             'Print #1 , Date$
             Atsnd = Atsnd + Tmpstr52
 
+         Case "LEECLK"
+            Cmderr = 0
+            Hora = Time(horamin)
+            Fecha = Date(horamin)
+            ATSND="Ultima CLK "+ hora+ " de "+fecha
+
+         Case "ACTCLK"
+            Cmderr = 0
+            Set Iniactclk
+            Atsnd = "ACT CLK"
+
+         Case "SETTAC"
+            If Numpar = 2 Then
+               Tactclk = Val(cmdsplit(2))
+               Tactclkeep = Tactclk
+               Atsnd = "Se configuro Tact CLK=" + Str(tactclk)
+            Else
+               Cmderr = 4
+            End If
+
+         Case "LEETAC"
+            Cmderr = 0
+            Atsnd = "Tact CLK=" + Str(tactclk)
+
          Case "SETDBG"
             Cmderr = 0
             Atsnd = "Se habilita display debug"
@@ -1273,6 +1358,20 @@ Sub Procser()
             Cmderr = 0
             Atsnd = "Contador de inicios =" + Str(cntrini)
 
+         Case "SETTOU"                                      ' Configura TImeout
+            If Numpar = 2 Then
+               Cmderr = 0
+               Toptout = Val(cmdsplit(2))
+               Toptouteep = Toptout
+               Atsnd = "Se configuro Timeout máximo en " + Str(toptout)
+            Else
+               Cmderr = 5
+            End If
+
+         Case "LEETOU"
+            Cmderr = 0
+            Atsnd = "Timeout máximo en " + Str(toptout)
+
          Case Else
             Cmderr = 1
 
@@ -1322,6 +1421,616 @@ Sub Leeradc()
 
 End Sub
 
+
+Sub Defaultvalues()
+   Trqststaeep = 10
+   Trqsnormaleep = 600
+   Trqsalarmaeep = 60
+   Cntrtxeep = 0
+   Dir_slave_eep = 1
+   Cntrcrcokeep = 0
+   Cntrcrcbadeep = 0
+   Cntractremotaeep = 0
+   Tmpstr52 = "06:00:00"
+   Timeini = Secofday(tmpstr52)
+   Timeinieep = Timeini
+   Tmpstr52 = "18:00:00"
+   Timefin = Secofday(tmpstr52)
+   Timefineep = Timefin
+   Cntrinieep = 0
+   Tactclkeep = 3600
+   Toptouteep = 3600
+End Sub
+
+Sub Procgps()
+   Reset Gpsnew
+   Set Relegps
+   Print #1 , "GPS1"
+   Trygps = 0
+   Do
+      If Sernew = 1 Then                                 'DATOS SERIAL 1
+         Reset Sernew
+         If Mid(serproc , 1 , 5) = "GPRMC" Then
+            'Set Gpsnew
+            Disable Urxc
+            Print #1 , "SER=" ; Serproc
+            Gpsproc = Serproc
+            Print #1 , "GPS=" ; Gpsproc
+            Numpar = Split(gpsproc , Cmdsplit(1) , ",")
+            If Numpar > 0 Then
+               If Cmdsplit(3) = "A" Then
+                  Set Gpsnew
+                  Hora = Mid(cmdsplit(2) , 1 , 2) + ":" + Mid(cmdsplit(2) , 3 , 2) + ":" + Mid(cmdsplit(2) , 5 , 2)
+                  Fecha = Mid(cmdsplit(10) , 1 , 2) + "/" + Mid(cmdsplit(10) , 3 , 2) + "/" + Mid(cmdsplit(10) , 5 , 2)
+                  Print #1 , Hora
+                  Print #1 , Fecha
+                  Tmpl = Syssec(hora , Fecha)
+                  Tmpl = Tmpl - 18000
+                  Time$ = Time(tmpl)
+                  Date$ = Date(tmpl)
+                  Print #1 , Time$
+                  Print #1 , Date$
+               End If
+            End If
+         End If
+         Call Procser()
+
+
+         Incr Trygps
+         Enable Urxc
+      End If
+
+   Loop Until Gpsnew = 1 Or Trygps = 200
+   Reset Relegps
+   Print #1 , "fIN gps ," ; Trygps
+End Sub
+
+
+Sub Procdtmf()
+   Print #1 , "NEW DTMF"
+   Print #1 , Time$ ; ";" ; Date$
+   For J = 1 To 30
+       Print #1 , Hex(tbl_rxdtmf(j)) ; ",";
+   Next
+   Print #1 ,
+   Tmpb3 = 0
+   For J = 1 To 30
+       Print #1 , Hex(tbl_rxdtmf(j)) ; ",";
+       If J.0 = 1 Then
+         Tmpb = Tbl_rxdtmf(j)
+       Else
+         Tmpb2 = Tbl_rxdtmf(j)
+         Shift Tmpb2 , Left , 4
+         Incr Tmpb3
+         Tbl_rxhex(tmpb3) = Tmpb Or Tmpb2
+       End If
+   Next
+   Print #1 ,
+
+   Print #1 , "hex dtmf"
+   For J = 1 To 15
+      Print #1 , Hex(tbl_rxhex(j)) ; ",";
+   Next
+   Print #1 ,
+   Tmpb = Crc8(tbl_rxhex , 14)
+   Print #1 , "CRC=" ; Hex(tmpb)
+
+   If Tmpb = Tbl_rxhex(15) Then                          ' Si esta bien el CRC
+      Print #1 , "CRC OK=";
+      Incr Cntrcrcok
+      Cntrcrcokeep = Cntrcrcok
+      Print #1 , Cntrcrcok
+
+       Tmpb = Tbl_rxdtmf(1)                                 'Numero de estacion
+       Print #1 , "Estacion=" ; Tmpb
+       Tmptout = Input_registers_table(21)
+       Kt = Tmpb - 1
+       Reset Tmptout.kt
+       Input_registers_table(21) = Tmptout
+       J = 21
+       Input_registers_table(21) = Tmptout
+       Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+       Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+       Tbl_cntrtout(tmpb) = 0
+
+       Atsnd = "$SETSAT," + Str(tmpb) + ","
+       Tbl_status(tmpb) = Tbl_rxdtmf(2)
+
+       If Tmpb = 10 Or Tmpb = 11 Then
+         Tmpb5 = Tbl_rxdtmf(2)
+         If Tmpb5 = 3 Then
+            Incr Cntractremota
+            Cntractremotaeep = Cntractremota
+            Input_registers_table(13) = Cntractremota
+         End If
+       End If
+
+       Tmphdr = Tbl_rxdtmf(2)
+       Ptrhdr = Tmpb - 1
+       Ptrhdr = Ptrhdr \ 4
+       Ptrhdr = Ptrhdr + 3
+
+       Ptrbhdr = Tmpb - 1
+       Ptrbhdr = Ptrbhdr Mod 4
+       Ptrbhdr = Ptrbhdr * 4
+       Print #1 , "STSTUS STA=" ; Tmphdr
+       Print #1 , "INPUT PTRHDR=" ; Ptrhdr
+       Print #1 , "Ptrbhdr=" ; Ptrbhdr
+       Input_registers_table(ptrhdr).ptrbhdr = Tmphdr.0
+       Incr Ptrbhdr
+       Input_registers_table(ptrhdr).ptrbhdr = Tmphdr.1
+       Incr Ptrbhdr
+       Input_registers_table(ptrhdr).ptrbhdr = Tmphdr.2
+       Incr Ptrbhdr
+       Input_registers_table(ptrhdr).ptrbhdr = Tmphdr.3
+       Print #1 , "INPUTreg(" ; Ptrhdr ; ")=" ; Hex(input_registers_table(ptrhdr))
+       'Print #1 , "$SETIPR," ; Ptrhdr ; "," ; Hex(input_registers_table(ptrhdr))
+       Tmpstr52 = "$SETIPR," + Str(ptrhdr) + "," + Hex(input_registers_table(ptrhdr))
+       Print #1 , Tmpstr52
+       Print #2 , Tmpstr52
+
+       Bs1 = Tbl_rxhex(2)
+       Bs2 = Tbl_rxhex(3)
+       Bs3 = Tbl_rxhex(4)
+       Bs4 = Tbl_rxhex(5)
+       Tbl_ctx(tmpb) = Tmps
+
+       Ptrhdr = Tmpb - 1
+       Ptrhdr = Ptrhdr * 6
+       Ptrhdr = Ptrhdr + 1
+       Print #1 , "PTRHDR=" ; Ptrhdr
+
+       Tmpw = Makeint(bs3 , Bs4)
+       Holding_registers_table(ptrhdr) = Tmpw
+       'Print #1 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
+       Tmpstr52 = "$SETHDR," + Str(ptrhdr) + "," + Hex(holding_registers_table(ptrhdr))
+       Print #1 , Tmpstr52
+       Print #2 , Tmpstr52
+
+       Tmpw = Makeint(bs1 , Bs2)
+       Incr Ptrhdr
+       Holding_registers_table(ptrhdr) = Tmpw
+       'Print #1 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
+       Tmpstr52 = "$SETHDR," + Str(ptrhdr) + "," + Hex(holding_registers_table(ptrhdr))
+       Print #1 , Tmpstr52
+       Print #2 , Tmpstr52
+
+
+       Print #1 , "Cntr_tx=" ; Tbl_ctx(tmpb) ; "," ; Hex(tmpdw)
+
+       Atsnd = Atsnd + Str(tbl_ctx(tmpb)) + ","
+
+       Bs1 = Tbl_rxhex(7)
+       Bs2 = Tbl_rxhex(8)
+       Bs3 = Tbl_rxhex(9)
+       Bs4 = Tbl_rxhex(10)
+       Tbl_adc1(tmpb) = Tmps                             'VBAT
+
+       Ptrhdr = Tmpb - 1
+       Ptrhdr = Ptrhdr * 6
+       Ptrhdr = Ptrhdr + 3
+       Print #1 , "PTRHDR=" ; Ptrhdr
+
+       Tmpw = Makeint(bs3 , Bs4)
+       Holding_registers_table(ptrhdr) = Tmpw
+       Print #1 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
+       Print #2 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
+       Tmpw = Makeint(bs1 , Bs2)
+       Incr Ptrhdr
+       Holding_registers_table(ptrhdr) = Tmpw
+       Print #1 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
+       Print #2 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
+
+       'Atsnd = Atsnd + Fusing(tmps , "#.##") + ","
+       Print #1 , "Vbat=" ; Tmps ; "," ; Hex(tmps)
+       Bs1 = Tbl_rxhex(11)
+       Bs2 = Tbl_rxhex(12)
+       Bs3 = Tbl_rxhex(13)
+       Bs4 = Tbl_rxhex(14)
+       Tbl_adc2(tmpb) = Tmps                             'VPS
+       Atsnd = Atsnd + Fusing(tbl_adc2(tmpb) , "#.##") + "," + Fusing(tbl_adc1(tmpb) , "#.##") + ","
+       Print #1 , "Vps=" ; Tmps ; "," ; Hex(tmps)
+       Ptrhdr = Tmpb - 1
+       Ptrhdr = Ptrhdr * 6
+       Ptrhdr = Ptrhdr + 5
+       Print #1 , "PTRHDR=" ; Ptrhdr
+
+       Tmpw = Makeint(bs3 , Bs4)
+       Holding_registers_table(ptrhdr) = Tmpw
+       Print #1 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
+       Print #2 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
+       Tmpw = Makeint(bs1 , Bs2)
+       Incr Ptrhdr
+       Holding_registers_table(ptrhdr) = Tmpw
+       Print #1 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
+       Print #2 , "$SETHDR," ; Ptrhdr ; "," ; Hex(holding_registers_table(ptrhdr))
+
+
+       Tbl_stain(tmpb) = Tbl_rxhex(6)
+       Print #1 , "STAIN=" ; Hex(tbl_stain(tmpb))
+
+       Atsnd = Atsnd + Str(tbl_rxdtmf(2)) + "," + Hex(tbl_stain(tmpb))
+       Print #1 , Atsnd
+
+       Tmphdr = Tbl_rxhex(6)
+       Ptrhdr = Tmpb - 1
+       Ptrhdr = Ptrhdr \ 2
+       Ptrhdr = Ptrhdr + 6
+
+       Ptrbhdr = Tmpb - 1
+       Ptrbhdr = Ptrbhdr Mod 2
+       Ptrbhdr = Ptrbhdr * 8
+       Print #1 , "INPUT PTRHDR=" ; Ptrhdr
+       Print #1 , "Ptrbhdr=" ; Ptrbhdr
+
+       Input_registers_table(ptrhdr).ptrbhdr = Tmphdr.0
+       Incr Ptrbhdr
+       Input_registers_table(ptrhdr).ptrbhdr = Tmphdr.1
+       Incr Ptrbhdr
+       Input_registers_table(ptrhdr).ptrbhdr = Tmphdr.2
+       Incr Ptrbhdr
+       Input_registers_table(ptrhdr).ptrbhdr = Tmphdr.3
+       Incr Ptrbhdr
+       Input_registers_table(ptrhdr).ptrbhdr = Tmphdr.4
+       Incr Ptrbhdr
+       Input_registers_table(ptrhdr).ptrbhdr = Tmphdr.5
+       Incr Ptrbhdr
+       Input_registers_table(ptrhdr).ptrbhdr = Tmphdr.6
+       Incr Ptrbhdr
+       Input_registers_table(ptrhdr).ptrbhdr = Tmphdr.7
+
+       Print #1 , "INPUTreg(" ; Ptrhdr ; ")=" ; Hex(input_registers_table(ptrhdr))
+       Print #1 , "$SETIPR," ; Ptrhdr ; "," ; Hex(input_registers_table(ptrhdr))
+       Print #2 , "$SETIPR," ; Ptrhdr ; "," ; Hex(input_registers_table(ptrhdr))
+
+      Tmps = Cntrtx
+
+
+      Tmpw = Makeint(bs3 , Bs4)
+      Input_registers_table(1) = Tmpw
+      Print #1 , "$SETIPR," ; "1" ; "," ; Hex(input_registers_table(1))
+      Print #2 , "$SETIPR," ; "1" ; "," ; Hex(input_registers_table(1))
+      Tmpw = Makeint(bs1 , Bs2)
+      Incr Ptrhdr
+      Input_registers_table(2) = Tmpw
+      Print #1 , "$SETIPR," ; "2" ; "," ; Hex(input_registers_table(2))
+      Print #2 , "$SETIPR," ; "2" ; "," ; Hex(input_registers_table(2))
+   Else
+      Print #1 , "CRC fail=";
+      Incr Cntrcrcbad
+      Cntrcrcbadeep = Cntrcrcbad
+      Print #1 , Cntrcrcbad
+   End If
+End Sub
+
+Sub Proctest()
+   Print #1 , "TEST ESTACION No. " ; Statst ; ", ESTADO=" ; Estadotst
+   Print #1 , Time$ ; ";" ; Date$
+   Tmpcntrsta = Cntrestaciones
+   Cntrestaciones = Statst
+   Tmpstatus = Status
+   Status = Estadotst
+   Call Gentrama()
+   Print #1 , "Trama HEX"
+   For J = 1 To 10
+      Print #1 , Hex(tramatx(j)) ; ",";
+   Next
+   Print #1,
+   Print #1 , "Trama DTMF"
+   Print #1 , "$RXDTMF";
+   For J = 1 To 20
+      Print #1 , "," ; Hex(tramatxdtmf(j)) ;
+   Next
+   Print #1,
+   Call Txdtmf()
+   Cntrestaciones = Tmpcntrsta
+
+   Statst = Cntrestaciones
+   Status = Tmpstatus
+   Cntrseg = 0
+   Reset Newtx
+   Incr Cntrtx
+   Cntrtxeep = Cntrtx
+   Print #1 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; Statst ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
+   Print #2 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; Statst ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
+
+End Sub
+
+Sub Procmodo()
+   Tmpl = Secofday()
+   If Enabug = 2 Then
+      Print #1 , Timeini ; "," ; Tmpl ; "," ; Timefin
+   End If
+   If Tmpl > Timeini And Tmpl < Timefin Then
+      Modooff = 0
+      If Modooff <> Modooffant Then
+         Print #1 , "MODO DIA " ; Time$
+'            Modooff = 0
+         Modooffant = Modooff
+         Estado_led = 1
+         Tmpstr52 = "$SETMOP,1"
+         Print #1 , Tmpstr52
+         Print #2 , Tmpstr52
+      End If
+   Else
+      Estado_led = 11
+      Modooff = 1
+      If Modooff <> Modooffant Then
+         Print #1 , "MODO NOCTURNO " ; Time$
+         'Modooff = 1
+         Modooffant = Modooff
+         Estado_led = 11
+         Tmpstr52 = "$SETMOP,0"
+         Print #1 , Tmpstr52
+         Print #2 , Tmpstr52
+      End If
+   End If
+
+   Incr Cntrmodooff
+   Cntrmodooff = Cntrmodooff Mod 300
+   If Cntrmodooff = 0 Then
+      If Modooff = 1 Then
+         Tmpstr52 = "$SETMOP,0"
+         Print #1 , Tmpstr52
+         Print #2 , Tmpstr52
+      Else
+         Tmpstr52 = "$SETMOP,1"
+         Print #1 , Tmpstr52
+         Print #2 , Tmpstr52
+      End If
+   End If
+
+End Sub
+
+Sub Txslaves()
+   Cntrestaciones = Cntrestaciones Mod Numsta
+   Incr Cntrestaciones
+   Print #1 , "NEW TX a Estacion " ; Cntrestaciones ; ", CNTRtx=" ; Cntrtx
+   Print #1 , Time$ ; ";" ; Date$
+   Input_registers_table(11) = Cntrestaciones
+   Input_registers_table(12) = Status
+   'Print #1 , "$SETIPR," ; "12" ; "," ; Hex(input_registers_table(12))
+   Tmpstr52 = "$SETIPR," + "12" + "," + Hex(input_registers_table(12))
+   Print #1 , Tmpstr52
+   Print #2 , Tmpstr52
+
+   If Cntrestaciones = Numsta Then
+      Reset Newtxper
+      Incr Cntrtx
+      Cntrtxeep = Cntrtx
+      Tmps = Cntrtx
+      Tmpw = Makeint(bs3 , Bs4)
+      Input_registers_table(1) = Tmpw
+      'Print #1 , "$SETIPR," ; "1" ; "," ; Hex(input_registers_table(1))
+      Tmpstr52 = "$SETIPR," + "1" + "," + Hex(input_registers_table(1))
+      Print #1 , Tmpstr52
+      Print #2 , Tmpstr52
+      Tmpw = Makeint(bs1 , Bs2)
+      Incr Ptrhdr
+      Input_registers_table(2) = Tmpw
+      'Print #1 , "$SETIPR," ; "2" ; "," ; Hex(input_registers_table(2))
+      Tmpstr52 = "$SETIPR," + "2" + "," + Hex(input_registers_table(2))
+      Print #1 , Tmpstr52
+      Print #2 , Tmpstr52
+   End If
+
+   Call Gentrama()
+   Print #1 , "Trama HEX"
+   For J = 1 To 10
+      Print #1 , Hex(tramatx(j)) ; ",";
+   Next
+   Print #1,
+   Print #1 , "Trama DTMF"
+   Print #1 , "$RXDTMF";
+   For J = 1 To 20
+      Print #1 , "," ; Hex(tramatxdtmf(j)) ;
+   Next
+   Print #1,
+   Print #1,
+   Call Txdtmf()
+
+   Print #1 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; Cntrestaciones ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
+   Print #2 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; Cntrestaciones ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
+
+End Sub
+
+Sub Txalerta()
+   If Newbroadcast = 1 Then
+      Reset Newbroadcast
+      Print #1 , "TX ALerta"
+      Print #1 , Time$ ; ";" ; Date$
+      Input_registers_table(12) = Status
+      Print #1 , "$SETIPR," ; "12" ; "," ; Hex(input_registers_table(12))
+      Print #2 , "$SETIPR," ; "12" ; "," ; Hex(input_registers_table(12))
+      Tmpcntrsta = Cntrestaciones
+      Cntrestaciones = &H0F
+      Call Gentrama()
+      Print #1 , "Trama HEX"
+      For J = 1 To 10
+         Print #1 , Hex(tramatx(j)) ; ",";
+      Next
+      Print #1,
+      Print #1 , "Trama DTMF"
+      Print #1 , "$RXDTMF";
+      For J = 1 To 20
+         Print #1 , "," ; Hex(tramatxdtmf(j)) ;
+      Next
+      Print #1,
+      Call Txdtmf()
+      Cntrestaciones = Tmpcntrsta
+      Incr Cntrtxbroadcast
+      Print #1 , "TX Broadcast " ; Cntrtxbroadcast
+      Cntrtxbroadcast = Cntrtxbroadcast Mod 5
+      If Cntrtxbroadcast = 0 Then
+         Reset Newtxalerta
+         Reset Inibroadcast
+          Cntrseg = 0
+          Reset Newtx
+      End If
+
+      Incr Cntrtx
+      Cntrtxeep = Cntrtx
+      Print #1 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; "15" ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
+      Print #2 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; "15" ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
+   End If
+
+End Sub
+
+Sub Txtest()
+   If Newbroadcast = 1 Then
+      Reset Newbroadcast
+      Print #1 , "TX TEST"
+      Print #1 , Time$ ; ";" ; Date$
+      Tmpcntrsta = Cntrestaciones
+      Cntrestaciones = &H0E
+      Input_registers_table(12) = Status
+      Print #1 , "$SETIPR," ; "12" ; "," ; Hex(input_registers_table(12))
+      Print #2 , "$SETIPR," ; "12" ; "," ; Hex(input_registers_table(12))
+      Call Gentrama()
+      Print #1 , "Trama HEX"
+      For J = 1 To 10
+         Print #1 , Hex(tramatx(j)) ; ",";
+      Next
+      Print #1,
+      Print #1 , "Trama DTMF"
+      Print #1 , "$RXDTMF";
+      For J = 1 To 20
+         Print #1 , "," ; Hex(tramatxdtmf(j)) ;
+      Next
+      Print #1,
+      Call Txdtmf()
+      Cntrestaciones = Tmpcntrsta
+
+      Incr Cntrtxbroadcast
+      Print #1 , "TX Broadcast " ; Cntrtxbroadcast
+      Cntrtxbroadcast = Cntrtxbroadcast Mod 5
+      If Cntrtxbroadcast = 0 Then
+         Reset Newtxtest
+         Reset Inibroadcast
+         Cntrseg = 0
+         Reset Newtx
+      End If
+      Incr Cntrtx
+      Cntrtxeep = Cntrtx
+      Print #1 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; "14" ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
+      Print #2 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; "14" ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
+   End If
+
+End Sub
+
+Sub Txnormal()
+   If Newbroadcast = 1 Then
+      Reset Newbroadcast
+      Print #1 , "TX NORMAL"
+      Print #1 , Time$ ; ";" ; Date$
+      Input_registers_table(12) = Status
+      Print #1 , "$SETIPR," ; "12" ; "," ; Hex(input_registers_table(12))
+      Print #2 , "$SETIPR," ; "12" ; "," ; Hex(input_registers_table(12))
+
+      Tmpcntrsta = Cntrestaciones
+
+      If Modooff = 0 Then
+         Cntrestaciones = &H0D
+         Tmpstr8 = "13"
+      Else
+         Cntrestaciones = &H0C
+         Tmpstr8 = "12"
+      End If
+
+
+      Call Gentrama()
+      Print #1 , "Trama HEX"
+      For J = 1 To 10
+         Print #1 , Hex(tramatx(j)) ; ",";
+      Next
+      Print #1,
+      Print #1 , "Trama DTMF"
+      Print #1 , "$RXDTMF";
+      For J = 1 To 20
+         Print #1 , "," ; Hex(tramatxdtmf(j)) ;
+      Next
+      Print #1,
+      Call Txdtmf()
+      Cntrestaciones = Tmpcntrsta
+
+      Incr Cntrtxbroadcast
+      Print #1 , "TX Broadcast " ; Cntrtxbroadcast
+      Cntrtxbroadcast = Cntrtxbroadcast Mod 5
+      If Cntrtxbroadcast = 0 Then
+         Reset Newtxnormal
+         Reset Inibroadcast
+         Cntrseg = 0
+         Reset Newtx
+      End If
+      Incr Cntrtx
+      Cntrtxeep = Cntrtx
+      Print #1 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; Tmpstr8 ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
+      Print #2 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; Tmpstr8 ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
+   End If
+
+End Sub
+
+Sub Procmodbusreg()
+   Incr Cntripadc
+   Cntripadc = Cntripadc Mod 900
+   If Cntripadc = 0 Then
+      Print #1 , "VBAT=" ; Vbat
+      J = 13
+      Input_registers_table(j) = Vbat1
+      Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+      Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+      J = 14
+      Input_registers_table(j) = Vbat2
+      Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+      Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+      J = 15
+      Input_registers_table(j) = Vbat3
+      Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+      Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+      J = 16
+      Input_registers_table(j) = Vbat4
+      Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+      Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+
+      Print #1 , "VPS=" ; Vps
+      J = 17
+      Input_registers_table(j) = Vps1
+      Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+      Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+      J = 18
+      Input_registers_table(j) = Vps2
+      Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+      Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+      J = 19
+      Input_registers_table(j) = Vps3
+      Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+      Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+      J = 20
+      Input_registers_table(j) = Vps4
+      Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+      Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+   End If
+
+End Sub
+
+Sub Vertout()
+   Tmptout = Input_registers_table(21)
+   For Jt = 1 To Numsta
+      Incr Tbl_cntrtout(jt)
+      If Tbl_cntrtout(jt) > Toptout Then
+         Kt = Jt - 1
+         Set Tmptout.kt
+         Tbl_cntrtout(jt) = 0
+      End If
+   Next
+   If Tmptout <> Input_registers_table(21) Then
+      J = 21
+      Input_registers_table(21) = Tmptout
+      Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+      Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+   End If
+
+End Sub
 
 '*******************************************************************************
 'TABLA DE DATOS

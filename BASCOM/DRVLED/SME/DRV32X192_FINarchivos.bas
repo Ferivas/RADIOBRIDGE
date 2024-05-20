@@ -322,13 +322,20 @@ Return
 
 Sectic:
    Set Newseg
-   Incr Num_ventana
-   'Num_ventana = Num_ventana Mod 16
-   'Estadoled = Lookup(estado_led , Tabla_estado)
-   'Iluminar = Estadoled.num_ventana
-   Toggle Iluminar
-   Ledout = Iluminar
-   'Staout = Iluminar
+'   Incr Num_ventana
+'   Num_ventana = Num_ventana Mod 16
+'   Estadoled = Lookup(estado_led , Tabla_estado)
+'   Iluminar = Estadoled.num_ventana
+'   Toggle Iluminar
+'   Ledout = Iluminar
+'   'Staout = Iluminar
+   If Sdinitok = 1 Then
+      Toggle Iluminar
+      Ledout = Iluminar
+   Else
+      Reset Ledout
+   endif
+
    Incr Cntrsegtemp
    Cntrsegtemp = Cntrsegtemp Mod 3
    If Cntrsegtemp = 0 Then Set Initemp

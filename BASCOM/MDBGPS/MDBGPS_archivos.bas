@@ -98,25 +98,25 @@ Dim Tmpstr52 As String * 82
 'Dim Cntrtx As Single                                        'Contador de transmisiones
 'Dim Cntrtxeep As Eram Single
 
-Dim Tbl_adc1(numsta) As Single                              ' Para almacenar los valores de voltaje bateria de la estaciones remotas
-Dim Tbl_adc2(numsta) As Single                              ' Para almacenar los valores de voltaje panel de la estaciones remotas
-Dim Tbl_adc3(numsta) As Single
+'Dim Tbl_adc1(numsta) As Single                              ' Para almacenar los valores de voltaje bateria de la estaciones remotas
+'Dim Tbl_adc2(numsta) As Single                              ' Para almacenar los valores de voltaje panel de la estaciones remotas
+'Dim Tbl_adc3(numsta) As Single
 
-Dim Tbl_stain(numsta) As Byte                               ' Almacena estado de entrada digital
-Dim Tbl_staout(numsta) As Byte                              ' Almacena estado de salida digital
+'Dim Tbl_stain(numsta) As Byte                               ' Almacena estado de entrada digital
+'Dim Tbl_staout(numsta) As Byte                              ' Almacena estado de salida digital
 
-Dim Tbl_status(numsta) As Byte                              ' Almacena estado de las estaciones (estatus y errores)
-Dim Tbl_ctx(numsta) As Dword
+'Dim Tbl_status(numsta) As Byte                              ' Almacena estado de las estaciones (estatus y errores)
+'Dim Tbl_ctx(numsta) As Dword
 
 Dim Status As Byte                                          'Almacena estado
-Dim Statusant As Byte
-Dim Tramatx(6) As Byte                                      'Trama de transmision
-Dim Tramatxdtmf(12) As Byte                                 ' Alamcena los codigos para generar los DTMF
+'Dim Statusant As Byte
+'Dim Tramatx(6) As Byte                                      'Trama de transmision
+'Dim Tramatxdtmf(12) As Byte                                 ' Alamcena los codigos para generar los DTMF
 
-Dim Tonodtmf As Byte
-Dim Ptrrxdtmf As Byte
-Dim Tbl_rxdtmf(32) As Byte                                  'Tabla para alamcenar tonos recibidos
-Dim Tbl_rxhex(16) As Byte
+'Dim Tonodtmf As Byte
+'Dim Ptrrxdtmf As Byte
+'Dim Tbl_rxdtmf(32) As Byte                                  'Tabla para alamcenar tonos recibidos
+'Dim Tbl_rxhex(16) As Byte
 
 'Dim Regb As Byte
 'Dim Newdv As Bit
@@ -300,7 +300,7 @@ Sub Inivar()
 Reset Led1
 
 Statusrx = 1
-Print #1 , "RTU BRIDGE"
+Print #1 , "MDBGPS RTU BRIDGE TEST"
 Print #1 , Version(1)
 Print #1 , Version(2)
 Print #1 , Version(3)

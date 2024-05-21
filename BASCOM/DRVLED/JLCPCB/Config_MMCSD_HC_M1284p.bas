@@ -45,8 +45,8 @@ Const Cmmc_soft = 0
                                                  ' SPI as Master
 
    ' HW-SPI is configured to highest Speed
-   Config Spi = Hard , Interrupt = Off , Data Order = Msb , Master = Yes , Polarity = High , Phase = 1 , Clockrate = 4 , Noss = 1
-'   Config Spi = Hard , Interrupt = Off , Data Order = Msb , Master = Yes , Polarity = High , Phase = 1 , Clockrate = 16 , Noss = 1
+   Config Spi = Hard , Interrupt = Off , Data_Order = Msb , Master = Yes , Polarity = High , Phase = 1 , Clockrate = 4 , Noss = 1
+'   Config Spi = Hard , Interrupt = Off , Data_order = Msb , Master = Yes , Polarity = High , Phase = 1 , Clockrate = 16 , Noss = 1
 '   Spsr = 1                                     ' Double speed on ATMega128
    Spiinit
 

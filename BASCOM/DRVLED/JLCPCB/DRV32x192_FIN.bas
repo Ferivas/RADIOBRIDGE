@@ -8,7 +8,7 @@
 ' Reloj en tiempo real
 ' Incluye recepcion de datos de GPS por puerto serial 2
 
-$version 0 , 1 , 65
+$version 0 , 1 , 70
 $regfile = "m1284pdef.dat"
 $crystal = 18432000
 $baud = 9600
@@ -154,11 +154,13 @@ $include "DRV32X192_FINarchivos.bas"
 
 Call Inivar()
 
-
+Tmpb = 0
 Do
    Call Diskinsertion()
    If Sdinitok = 0 Then
-      'Call Espera(200)
+      Incr Tmpb
+      print #1, "Try ";tmpb
+      Call Espera(100)
       'Toggle Ledout
    End If
 Loop Until Sdinitok = 1

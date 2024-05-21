@@ -300,7 +300,7 @@ Sub Inivar()
 Reset Led1
 
 Statusrx = 1
-Print #1 , "MDBGPS RTU BRIDGE TEST"
+Print #1 , "MDBGPS RTU BRIDGE 2024"
 Print #1 , Version(1)
 Print #1 , Version(2)
 Print #1 , Version(3)

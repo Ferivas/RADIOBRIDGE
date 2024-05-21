@@ -27,7 +27,7 @@
 
 
 
-$version 0 , 1 , 167
+$version 0 , 1 , 171
 $regfile = "m128def.dat"
 $crystal = 16000000
 $baud = 9600
@@ -36,7 +36,7 @@ $baud1 = 9600
 $hwstack = 128
 $swstack = 128
 $framesize = 128
-$projecttime = 129
+$projecttime = 134
 
 
 'Declaracion de constantes
@@ -200,6 +200,22 @@ Do
       Print #1 , "CLK>" ; Time$ ; "," ; Date$
    End If
 
+
+
+   If Iniprog = 1 Then
+      Print #1 , "Ini modo Prog"
+      Tmpprg = Estado_led
+      Estado_led = 16
+      Do
+         If Sernew = 1 Then                                 'DATOS SERIAL 1
+            Reset Sernew
+            Print #1 , "SER1=" ; Serproc
+            Call Procser()
+         End If
+      Loop Until Iniprog = 0
+      Print #1 , "Fin modo Prog"
+      Estado_led = Tmpprg
+   End If
 
    If Newseg = 1 Then
       Reset Newseg

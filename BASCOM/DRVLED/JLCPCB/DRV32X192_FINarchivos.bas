@@ -631,7 +631,7 @@ Sub Leersta()
          Print #1 , "L>" ; Lonfile
          Print #1 , "L>" ; Filename
 
-         T = Lof(#3)
+         T = Lof(#3)                                        'Returns the length of the File in Bytes
          Print #1 , "LOF:" ; T
          Tmplsd = 1
          Tmpptr = 0
@@ -711,7 +711,7 @@ End Sub
 Sub Rdlinesd()
    Get #3 , Sample , Tmplsd
    Line Input #3 , Atsnd
-   Tmplsd = Loc(#3)
+   Tmplsd = Loc(#3)                                         'Returns the position of last read or written Byte of the file
    If Lonfile =< Tmplsd Then
       Tmplsd = 1
       Tmpb = 1

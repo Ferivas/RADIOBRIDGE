@@ -45,6 +45,9 @@ Dim Tmpb5 As Byte
 Dim Tmpcntrsta As Byte
 Dim Tmpl As Long
 Dim Enabug As Byte
+Dim Tmpprg As Byte
+
+Dim Iniprog As Bit
 
 Dim Ptrhdr As Byte
 Dim Ptrbhdr As Byte
@@ -1052,6 +1055,24 @@ Sub Procser()
             Set Newtxper
             Atsnd = "Nueva tx Periodica"
 
+         Case "INIPRG"
+            If Numpar = 2 Then
+               Tmpb = Val(cmdsplit(2))
+               If Tmpb < 2 Then
+                  Cmderr = 0
+                  If Tmpb = 0 Then
+                     Reset Iniprog
+                  Else
+                     Set Iniprog
+                  End If
+                  Atsnd = "Se config INIPRG a " + Str(tmpb)
+               Else
+                  Cmderr = 5
+               End If
+            Else
+               Cmderr = 4
+            End If
+
          Case "SETDIR"
             If Numpar = 2 Then
                Tmpb = Val(cmdsplit(2))
@@ -1230,6 +1251,7 @@ Sub Procser()
                   Atsnd = "WATCHING INFORMA. Se configuro reloj en " + Date$ + " a " + Time$
                   Horamin = Syssec()
                   Horamineep = Horamin
+                  Set Gpsnew
                   'Set Actclkok
                Else
                   Cmderr = 6

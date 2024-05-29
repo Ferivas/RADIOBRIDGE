@@ -19,7 +19,7 @@
 ' Test    - El Master envia comando de configuracion de Test de Audio y DRVLED
 ' Naranja - El Master envia comando de configuracion de estado de alarma
 
-$version 0 , 1 , 278
+$version 0 , 1 , 280
 $regfile = "m128def.dat"
 $crystal = 16000000
 $baud = 9600
@@ -157,7 +157,7 @@ Enable Interrupts
 '*******************************************************************************
 '* Archivos incluidos
 '*******************************************************************************
-$include "RadioBridge_M128_archivos.bas"
+$include "RadioBridge_VOL_archivos.bas"
 
 
 
@@ -173,9 +173,6 @@ Do
       Print #1 , "SER1=" ; Serproc
       Call Procser()
    End If
-
-
-   'Call Rxdtmf()                                            ' Pruebo con DV si hay un dato valido
 
    If Newdv = 1 Then
       Reset Newdv
@@ -213,8 +210,8 @@ Do
    If Newdrv = 1 Then
       Reset Newdrv
       If Drvaudiook = 0 Then
-         Print #1 , "$DRVAUD," ; Status
-         Print #2 , "$DRVAUD," ; Status
+         Print #1 , "$DRVAUD," ; Status ; "," ; Volumen
+         Print #2 , "$DRVAUD," ; Status ; "," ; Volumen
          Incr Cntrsubsta
          Cntrsubsta = Cntrsubsta Mod 10
          If Cntrsubsta = 0 Then

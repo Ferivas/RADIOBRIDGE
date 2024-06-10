@@ -62,3 +62,19 @@ Los cambios se muestran en las dos figuras siguientes:
 Si se graba el bootloader URboot en los ATmega, se puede programarlos con un Raspberry donde se instalo avrdude utilizando esta línea de comando
 
 *avrdude -p m1284p -c arduino -P /dev/ttyUSB0 -b 57600 -F -D -U flash:w:MBDGPS.hex -v*
+
+## AMPLIFICADOR DE AUDIO
+### Interfaz I2C
+El integrado U5 es un interfaz I2C (PCF8591P) que tiene cuatro entradas analógicas y una salida analógica.
+Las entradas analógicas se utilizan para:
+* Analog 0 monitorea el voltaje de entrada a la unidad luego de ser encendida
+* Analog 1 monitorea el sensor de temperatura para determinar sobretemperatura
+* Analog 2 monitorea el drive de corriente de la señal de salida B
+* Analog 2 monitorea el drive de corriente de la señal de salida A
+
+  La salida analógica se utiliza para encender la salida del amplificador y configurar el modo sirena o el modo voz.
+  * Si el voltaje de salida es 0V el amplificador está apagado
+  * Si el voltaje de salida se configura a 3.5V se enciende el amplificador en modo sirena
+  * Si el voltaje de salida es mayor a 4V el voltaje activa U1D y Q4. El interruptor del relé K4 y K6 el cual cambia las salidas al tap de  alto voltaje en la salida del transformador y pone al amplificador en modo voz.
+ 
+    

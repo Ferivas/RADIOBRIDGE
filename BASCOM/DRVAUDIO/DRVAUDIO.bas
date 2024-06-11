@@ -9,7 +9,7 @@
 '
 
 
-$version 0 , 1 , 135
+$version 0 , 1 , 149
 $regfile = "m1284pdef.dat"
 $crystal = 7372800
 '$crystal = 8000000
@@ -149,7 +149,7 @@ Do
       Print #1 , "INITEST"
       Reset Pwrmp3                                          'MOdulo ON
       Set Ena1
-      Call Wrdac(255)                                       ' Silencio amplificador
+      'Call Wrdac(255)                                       ' ON amplificador
 
       T0rate = 200
       Reset T0tout
@@ -164,6 +164,7 @@ Do
       If Tblser1(4) = &H3F Then
          Print #1 , "Modulo ON"
          If Tblser1(7) = &H02 Then
+            Call Wrdac(255)                                 ' ON amplificador
             Print #1 , "SD OK"
             Print #1 , "$DRVAUD,2"
             Print #1 , "$DRVAUD,2"                          'NO SD presente
@@ -185,13 +186,15 @@ Do
                   Print #1 , "SER1=" ; Serproc
                   Call Procser()
                End If
-
+               If Leeradc = 1 Then
+                  Reset Leeradc
+                  Print #1 , "READ ADC"
+                  Call Rdadc(numcanal)
+               End If
                Tmpw = T0cntr Mod 100
                If Tmpw = 0 Then
                   Print #1 , "T0CNTR=" ; T0cntr
                End If
-
-
             Loop Until Datomp3 = &H3D Or T0tout = 1 Or Status = 1
             Print #1 , "Fin tono Test"
             Call Procser1()
@@ -218,6 +221,12 @@ Do
                If Sernew1 = 1 Then
                   Reset Sernew1
                   Call Procser1()
+               End If
+
+               If Leeradc = 1 Then
+                  Reset Leeradc
+                  Print #1 , "READ ADC"
+                  Call Rdadc(numcanal)
                End If
 
                Tmpw = T0cntr Mod 100
@@ -264,7 +273,7 @@ Do
       'Comando para anuncio de modo Alerta Narnaja sola vez
       Reset Pwrmp3                                          'MOdulo ON
       Set Ena1
-      Call Wrdac(255)                                       ' Silencio amplificador
+      'Call Wrdac(255)                                       ' ON amplificador
 
       T0rate = 200
       Reset T0tout
@@ -280,6 +289,7 @@ Do
       If Tblser1(4) = &H3F Then
          Print #1 , "Modulo ON"
          If Tblser1(7) = &H02 Then
+            Call Wrdac(255)                                 ' ON amplificador
             Print #1 , "SD OK"
             Print #1 , "$DRVAUD,3"
             Print #1 , "$DRVAUD,3"                          'NO SD presente

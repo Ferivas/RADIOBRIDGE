@@ -280,7 +280,7 @@ End Sub
 Sub Wrdac(byval Dacval As Byte)
    'I2cinit
    '   Waitms 500
-   Print #1 , "wr dac"
+   Print #1 , "wr dac, " ; Dacval
    I2cstart
    I2cwbyte Pcf8591write
    I2cwbyte Pcf8591dacconfig
@@ -290,20 +290,23 @@ End Sub
 
 Sub Rdadc(canal As Byte)
    Waitms 100
-   Print #1 , "READ ADC"
-   Print #1 ,"Canal=" ; Canal
+'   Print #1 , "READ ADC"
+'   Print #1 ,"Canal=" ; Canal
    I2cstart
-   ' I2cwbyte Pcf8591write
+   I2cwbyte Pcf8591write
    I2cwbyte Canal
    I2cstart
    I2cwbyte Pcf8591read
-   I2crbyte Adcin , Ack                                       ' Odczyt kilku bajtów
-   I2crbyte Adcin , Nack                                      ' Odczyt ostatniego bajtu
+
+   I2crbyte Adcin , Ack                                     ' Odczyt kilku bajtów
+   I2crbyte Adcin , Nack                                    ' Odczyt ostatniego bajtu
+   'Print #1 , "ADC" ; Canal ; "=" ; Hex(adcin) ; ",";
    I2cstop
-   Print #1 , "ADC" ; Canal ; "=" ; Hex(adcin) ; ",";
+   'Print #1 , "ADC" ; Canal ; "=" ; Hex(adcin) ; ",";
    Tmps = Adcin * 30
    Tmps = Tmps / 255
    Print #1 , Tmps
+   Print #1 , "$LEEADC," ; Canal ; "," ; Adcin
 End Sub
 
 ' Subrutina para generar espera
@@ -366,14 +369,14 @@ End Sub
 ' Procesamiento de comandos
 '*******************************************************************************
 Sub Procser()
-   Print #1 , "$" ; Serproc
+   'Print #1 , "$" ; Serproc
    Tmpstr52 = Mid(serproc , 1 , 6)
    Numpar = Split(serproc , Cmdsplit(1) , ",")
-   If Numpar > 0 Then
-      For Tmpb = 1 To Numpar
-         Print #1 , Tmpb ; ":" ; Cmdsplit(tmpb)
-      Next
-   End If
+'   If Numpar > 0 Then
+'      For Tmpb = 1 To Numpar
+'         Print #1 , Tmpb ; ":" ; Cmdsplit(tmpb)
+'      Next
+'   End If
 
    If Len(cmdsplit(1)) = 6 Then
       Cmdtmp = Cmdsplit(1)

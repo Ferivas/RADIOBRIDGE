@@ -98,7 +98,10 @@ Dim Ptrani As Word
 Dim Cntrsubsta As Byte
 Dim Modooff As Bit
 Dim Volumen As Byte
-
+Dim Inileei2c As Bit
+Dim Cntrleci2c As Byte
+Dim Cntrtryi2c As Byte
+Dim Vali2c(4) As Byte
 
 Dim Tramatx(16) As Byte                                     'Trama de transmision
 Dim Tramatxdtmf(32) As Byte                                 ' Alamcena los codigos para generar los DTMF
@@ -561,6 +564,7 @@ Sub Leersta()
 
       If Status <> Statusant Then
          Reset Drvaudiook
+         Set Inileei2c
          Statusant = Status
          Print #1 , "Cambio de Status=" ; Status
 
@@ -586,7 +590,8 @@ Sub Leersta()
       If Status <> Statusant Then
          Reset Drvaudiook
          Statusant = Status
-         Print #1 , "Nuevo Stastus Recibido por Radio=" ; Status
+         Print #1 , "Nuevo Status Recibido por Radio=" ; Status
+         Set Inileei2c 
          Select Case Status
             Case 1:
                Numani = 600
@@ -1006,6 +1011,36 @@ Sub Procser()
          Case "LEEVDC"
             Cmderr = 0
             Atsnd = "Vbat=" + Fusing(vbat , "#.#") + ", Vps=" + Fusing(vps , "#.#") + ", Vdc3=" + Fusing(vdc3 , "#.#")
+
+         Case "LEEI2C"
+            If Numpar = 3 Then
+               Tmpb = Val(cmdsplit(2))
+               If Tmpb < 4 Then
+                  Tmpb2 = Val(cmdsplit(3))
+                  Incr Tmpb
+                  Vali2c(tmpb) = Tmpb2
+                  Atsnd = "Se conf I2C" + Str(tmpb) + "=" + Str(tmpb2)
+                  Cmderr = 0
+               Else
+                  Cmderr = 5
+               End If
+
+            Else
+               Cmderr = 4
+            End If
+
+         Case "VALI2C"
+            If Numpar = 2 Then
+               Tmpb = Val(cmdsplit(2))
+               If Tmpb > 0 And Tmpb < 5 Then
+                  Cmderr = 0
+                  Atsnd = "ValI2C " + Str(tmpb) + "=" + Str(vali2c(tmpb))
+               Else
+                  Cmderr = 5
+               End If
+            Else
+               Cmderr = 4
+            End If
 
          Case Else
             Cmderr = 1

@@ -19,7 +19,7 @@
 ' Test    - El Master envia comando de configuracion de Test de Audio y DRVLED
 ' Naranja - El Master envia comando de configuracion de estado de alarma
 
-$version 0 , 1 , 280
+$version 0 , 1 , 303
 $regfile = "m128def.dat"
 $crystal = 16000000
 $baud = 9600
@@ -190,6 +190,27 @@ Do
    If Newadc = 1 Then
       Reset Newadc
       Call Leeradc()
+
+      If Inileei2c = 1 Then
+         'Print #1 , "I2C " ; Cntrleci2c
+         If Cntrleci2c < 4 Then
+            Print #1 , "$LEEI2C," ; Cntrleci2c
+            Print #2 , "$LEEI2C," ; Cntrleci2c
+         End If
+         Incr Cntrleci2c
+         Cntrleci2c = Cntrleci2c Mod 10
+         If Cntrleci2c = 0 Then
+            Print #1 , "Cntrtryi2cA=" ; Cntrtryi2c
+            Incr Cntrtryi2c
+           ' Print #1 , "Cntrtryi2cB=" ; Cntrtryi2c
+            Cntrtryi2c = Cntrtryi2c Mod 3
+            If Cntrtryi2c = 0 Then
+               Reset Inileei2c
+'               Cntrtryi2c
+               Print #1 , "FIN consulta ADC"
+            End If
+         End If
+      End If
    End If
 
 
@@ -221,6 +242,7 @@ Do
       End If
    End If
 
+
    If Newsubsta = 1 Then
       Reset Newsubsta
       Incr Ptrani
@@ -245,6 +267,7 @@ Do
          Print #1 , Ptrani ; "," ; Valsta ; "," ; "OFF=" ; Modooff
       End If
       Call Outsubsta(valsta)
+
    End If
 
    If Inivariables = 1 Then

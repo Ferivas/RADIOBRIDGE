@@ -9,7 +9,7 @@
 '
 
 
-$version 0 , 1 , 149
+$version 0 , 1 , 154
 $regfile = "m1284pdef.dat"
 $crystal = 7372800
 '$crystal = 8000000
@@ -124,9 +124,9 @@ Do
       Call Wrdac(dacout)
    End If
 
-   If Leeradc = 1 Then
-      Reset Leeradc
-      Print #1 , "READ ADC"
+   If Leeri2c = 1 Then
+      Reset Leeri2c
+      Print #1 , "READ I2C ADC"
       Call Rdadc(numcanal)
    End If
 
@@ -140,246 +140,23 @@ Do
       Call Wrdac(0)                                         ' Silencio amplificador
       'Comando para silenciar reproduccion de audio
       Set Pwrmp3                                            ' off dfp
+   End If
+
+   If Inirespdrv = 1 Then
+      Reset Inirespdrv
+      Print #1 , "$DRVAUD," ; Str(status) ; "," ; Str(volumen)
 
    End If
 
 
    If Initest = 1 Then
       Reset Initest
-      Print #1 , "INITEST"
-      Reset Pwrmp3                                          'MOdulo ON
-      Set Ena1
-      'Call Wrdac(255)                                       ' ON amplificador
-
-      T0rate = 200
-      Reset T0tout
-      T0cntr = 0
-      Set T0ini
-      Do
-
-      Loop Until Sernew1 = 1 Or T0tout = 1
-      Call Procser1()
-      Reset Sernew1
-
-      If Tblser1(4) = &H3F Then
-         Print #1 , "Modulo ON"
-         If Tblser1(7) = &H02 Then
-            Call Wrdac(255)                                 ' ON amplificador
-            Print #1 , "SD OK"
-            Print #1 , "$DRVAUD,2"
-            Print #1 , "$DRVAUD,2"                          'NO SD presente
-            Print #1 , "Wait 2"
-            Call Espera(200)
-            Print #1 , "FIN"
-            Print #1 , "Vol=" ; Volumen
-            Call Cmddfp(&H06 , Volumen)
-            Call Cmddfp(&H0f , &H0106)
-            Print #1 , "Tono Info TEST"
-            T0rate = 2000
-            Reset T0tout
-            T0cntr = 0
-            Set T0ini
-            Do
-               Datomp3 = Tblser1(4)
-               If Sernew = 1 Then                           'DATOS SERIAL 1
-                  Reset Sernew
-                  Print #1 , "SER1=" ; Serproc
-                  Call Procser()
-               End If
-               If Leeradc = 1 Then
-                  Reset Leeradc
-                  Print #1 , "READ ADC"
-                  Call Rdadc(numcanal)
-               End If
-               Tmpw = T0cntr Mod 100
-               If Tmpw = 0 Then
-                  Print #1 , "T0CNTR=" ; T0cntr
-               End If
-            Loop Until Datomp3 = &H3D Or T0tout = 1 Or Status = 1
-            Print #1 , "Fin tono Test"
-            Call Procser1()
-            Print #1 , "Tono TEST"
-
-            Call Cmddfp(&H0f , &H0106)
-            Call Espera(100)
-            Call Procser1()
-            Call Cmddfp(&H08 , &H0000)                      ' En repeticion
-
-
-            T0rate = 3000
-            Reset T0tout
-            T0cntr = 0
-            Set T0ini
-
-            Do
-               If Sernew = 1 Then                           'DATOS SERIAL 1
-                  Reset Sernew
-                  Print #1 , "SER1=" ; Serproc
-                  Call Procser()
-               End If
-
-               If Sernew1 = 1 Then
-                  Reset Sernew1
-                  Call Procser1()
-               End If
-
-               If Leeradc = 1 Then
-                  Reset Leeradc
-                  Print #1 , "READ ADC"
-                  Call Rdadc(numcanal)
-               End If
-
-               Tmpw = T0cntr Mod 100
-               If Tmpw = 0 Then
-                  Print #1 , "T0CNTR=" ; T0cntr
-               End If
-
-            Loop Until T0tout = 1 Or Status = 1
-
-            Print #1 , "FIN TEST"
-
-            Call Cmddfp(&H0e , &H0000)
-            Call Espera(100)
-            Call Procser1()
-            Status = 1
-
-
-         Else
-            Print #1 , "NO SD"
-            Print #1 , "$DRVAUD,4"
-            Print #1 , "$DRVAUD,4"                          'NO SD presente
-         End If
-
-      Else
-         Print #1 , "Modulo NO Presente"
-         Reset Ena1
-         Reset Ena2
-         Call Wrdac(0)                                         ' Silencio amplificador
-         Set Pwrmp3
-         Set Initest
-
-      End If
-
-      'Comando para anuncio de modo test 1 sola vez
-
-      'Comando para auncio continuo de modo test
-
-      '
+      Call Proctest()
    End If
 
    If Anaranja = 1 Then
       Reset Anaranja
-      Print #1 , "ALERTA NARANJA"
-      'Comando para anuncio de modo Alerta Narnaja sola vez
-      Reset Pwrmp3                                          'MOdulo ON
-      Set Ena1
-      'Call Wrdac(255)                                       ' ON amplificador
-
-      T0rate = 200
-      Reset T0tout
-      T0cntr = 0
-      Set T0ini
-      Do
-
-      Loop Until Sernew1 = 1 Or T0tout = 1
-      Call Procser1()
-      Reset Sernew1
-
-      'Comando para auncio continuo de modo alerta naranja
-      If Tblser1(4) = &H3F Then
-         Print #1 , "Modulo ON"
-         If Tblser1(7) = &H02 Then
-            Call Wrdac(255)                                 ' ON amplificador
-            Print #1 , "SD OK"
-            Print #1 , "$DRVAUD,3"
-            Print #1 , "$DRVAUD,3"                          'NO SD presente
-
-            Call Cmddfp(&H0f , &H0108)
-            Print #1 , "Tono Info ALARMA"
-
-            T0rate = 2000
-            Reset T0tout
-            T0cntr = 0
-            Set T0ini
-            Do
-               Datomp3 = Tblser1(4)
-               If Sernew = 1 Then                           'DATOS SERIAL 1
-                  Reset Sernew
-                  Print #1 , "SER1=" ; Serproc
-                  Call Procser()
-               End If
-
-               Tmpw = T0cntr Mod 100
-               If Tmpw = 0 Then
-                  Print #1 , "T0CNTR=" ; T0cntr
-               End If
-
-            Loop Until Datomp3 = &H3D Or T0tout = 1 Or Status = 1
-            Print #1 , "Fin tono ALARMA"
-            Call Procser1()
-            Print #1 , "Tono ALARMA"
-
-            Call Cmddfp(&H0f , &H0108)
-            Call Espera(100)
-            Call Procser1()
-            Call Cmddfp(&H08 , &H0000)                      ' En repeticion
-
-            Cntrmin = 0
-            Do
-
-               T0rate = 6000
-               Reset T0tout
-               T0cntr = 0
-               Set T0ini
-
-               Incr Cntrmin
-               Do
-                  If Sernew = 1 Then                           'DATOS SERIAL 1
-                     Reset Sernew
-                     Print #1 , "SER1=" ; Serproc
-                     Call Procser()
-                  End If
-
-                  If Sernew1 = 1 Then
-                     Reset Sernew1
-                     Call Procser1()
-                  End If
-
-                  Tmpw = T0cntr Mod 100
-                  If Tmpw = 0 Then
-                     Print #1 , "T0CNTR=" ; T0cntr
-                  End If
-
-
-               Loop Until T0tout = 1 Or Status = 1
-               Print #1 , "Cntrmin=" ; Cntrmin
-
-            Loop Until Cntrmin = 30 Or Status = 1
-
-            Print #1 , "FIN ALARMA"
-            Call Cmddfp(&H0e , &H0000)
-            Call Espera(100)
-            Call Procser1()
-            Status = 1
-
-         Else
-            Print #1 , "NO SD"
-            Print #1 , "$DRVAUD,5"
-            Print #1 , "$DRVAUD,5"                          'NO SD presente
-         End If
-
-      Else
-        Print #1 , "Modulo NO Presente"
-         Reset Ena1
-         Reset Ena2
-         Call Wrdac(0)                                         ' Silencio amplificador
-         Set Pwrmp3
-         Call Espera(100)
-          'Call Procser1()
-
-         Set Anaranja
-      End If
-     '
+      Call Procalerta()
    End If
 
    If Test = 0 Then

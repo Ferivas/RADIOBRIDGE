@@ -77,4 +77,19 @@ Las entradas analógicas se utilizan para:
   * Si el voltaje de salida se configura a 3.5V se enciende el amplificador en modo sirena
   * Si el voltaje de salida es mayor a 4V el voltaje activa U1D y Q4. El interruptor del relé K4 y K6 el cual cambia las salidas al tap de  alto voltaje en la salida del transformador y pone al amplificador en modo voz.
  
+ ### COMANDOS PARA LEER PARAMETROS I2C
+ Para leer los canalaes ADC del interfaz I2C (PCF8591P) se utiliza el comando
+
+ *LEEI2C,Numadc*
+
+  En donde Numadc varai entre 1 y 4 para leer los canales 0 a 3
+
+  Para escribir en el DAC se utiliza el comando
+
+  *SETI2C,Valor*
+
+  En donde valor varía entre 0 y 255
+
+  
+ 
     

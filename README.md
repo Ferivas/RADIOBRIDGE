@@ -23,16 +23,40 @@ En el BASCOM se escoge la opción de "USBASP programmer" y cuando se programa el
 
 ## PROGRAMACION NORMAL
 Las actualizaciones de programa se instalan por el puerto serial con un  cable USB micro en el conector USB1 de la tarjeta. Se utiliza el BASCOM o el programa Bootloader de MCSelectronics ( https://www.mcselec.com/index.php?option=com_docman&task=doc_download&gid=153&Itemid=54 ) 
-Se escoge el puerto detectado en la PC a la velocidad de 39400bps y se descarga este programa https://github.com/Ferivas/RADIOBRIDGE/blob/main/BASCOM/MAINBOARD/RadioBridge_M128.hex
+Se escoge el puerto detectado en la PC a la velocidad de 38400bps y se descarga este programa https://github.com/Ferivas/RADIOBRIDGE/blob/main/BASCOM/MAINBOARD/RadioBridge_M128.hex
 
-## CONFIGURACION INICIAL
+## COMANDOS IMPORTANTES RADIOBRIDGE
+### CONFIGURACION INICIAL
 Es necesario inicializar el equipo a los valores por defecto. Para est se utiliza el puerto serial configurado a 9600, 8,N,1 y con un programa terminal (se recomienda Hterm) se ingresa el siguiente comando<br>
 *$RSTVAR*
 
-## CONFIGURACION DEL NUMERO DE ESTACION
+### CONFIGURACION DEL NUMERO DE ESTACION
 Una vez programada la tarjeta el número de estación se puede configurar por el puerto serial configurado a 9600, 8,N,1 con <br>
 
 *$setsta,Numestacion*
+
+### ALMACENAMIENTO DE LOS CANALES ADC DEL DISPOSITIVO I2C DE DRVAUDIO
+Para configurar los valores de los parámetros I2C se utiliza el comando
+
+*LEEI2C,Numcanal;Valcanal*
+
+Este comando se recibe de la tarjeta del DRVAUDIO y almacena los valores de los canlaes ADC del dispositvo I2C del DRVAUDIO en una tabla Vali2c(4) que alamcena estos valores para comparar. Numcanal varía entre 1 y 4
+
+### LECTURA DE LOS VALORES DE LOS CANALES ADC DEL DISPOSITIVO I2C DE DRVAUDIO
+*VALI2C,Numcanal*
+
+Numcanal varia entre 1 y 4
+
+### CONFIGURACION DE VALORES DE COMPARACION DE CANALES ADC
+Para poder trasnmitir el estado de los canales ADC se compara el valor recibido del DRVAUDIO con un valor previamente configurado en el RADIOBRIDGE, de manera que se pueda configurar bits si el valor leído del DRVAUDIO es mayor o menor que este valor de compración. Para esto se utiliza el comando
+
+*TOPI2C,Canal;Valor*
+
+Y para leer estos valores configurados se utiliza el comando
+
+*LEETOP,Canal*
+
+
 
 ## PRUEBAS ESCLAVOS DESDE MASTER
 Desde el Hterm enviar el siguiente comando a 9600,8,N,1

@@ -27,7 +27,7 @@
 
 
 
-$version 0 , 1 , 175
+$version 0 , 1 , 178
 $regfile = "m128def.dat"
 $crystal = 16000000
 $baud = 9600
@@ -36,7 +36,7 @@ $baud1 = 9600
 $hwstack = 128
 $swstack = 128
 $framesize = 128
-$projecttime = 141
+$projecttime = 146
 
 
 'Declaracion de constantes
@@ -45,6 +45,8 @@ Const Numsample = 8                                         ' Numero de muestras
 Const Numadc = 3
 Const Tactadc = 900
 Const Tactadc_10 = Tactadc - 10
+
+Const Numregtimeout = 20
 
 
 'Const Modbus_slave_adress = 4

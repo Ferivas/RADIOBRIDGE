@@ -19,7 +19,7 @@
 ' Test    - El Master envia comando de configuracion de Test de Audio y DRVLED
 ' Naranja - El Master envia comando de configuracion de estado de alarma
 
-$version 0 , 1 , 303
+$version 0 , 1 , 316
 $regfile = "m128def.dat"
 $crystal = 16000000
 $baud = 9600
@@ -34,7 +34,8 @@ $framesize = 128
 Const Numsta = 12                                           'Numero de estaciones
 Const Numsample = 8                                         ' Numero de muestras para promediar los ADC
 Const Numadc = 3
-
+Const Numi2c = 4
+Const Numi2c_masuno = Numi2c + 1
 Const Cini = &H24                                           'Caracter de inicio
 Const Idmaster = &H55
 
@@ -194,8 +195,9 @@ Do
       If Inileei2c = 1 Then
          'Print #1 , "I2C " ; Cntrleci2c
          If Cntrleci2c < 4 Then
-            Print #1 , "$LEEI2C," ; Cntrleci2c
-            Print #2 , "$LEEI2C," ; Cntrleci2c
+            Tmpcanal = Cntrleci2c + 1
+            Print #1 , "$LEEI2C," ; Tmpcanal
+            Print #2 , "$LEEI2C," ; Tmpcanal
          End If
          Incr Cntrleci2c
          Cntrleci2c = Cntrleci2c Mod 10

@@ -9,7 +9,7 @@
 '
 
 
-$version 0 , 1 , 154
+$version 0 , 1 , 155
 $regfile = "m1284pdef.dat"
 $crystal = 7372800
 '$crystal = 8000000
@@ -25,6 +25,9 @@ $framesize = 128
 Const Pcf8591write = &B10011100
 Const Pcf8591read = &B10011101
 Const Pcf8591dacconfig = &B01000000
+
+Const Numcanali2c = 4
+Const Numcanali2c_masuno = Numcanali2c + 1
 
 'Configuracion de entradas/salidas
 Led1 Alias Portb.2                                          'LED ROJO

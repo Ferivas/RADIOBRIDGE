@@ -23,7 +23,8 @@ Declare Sub Leersta()
 Declare Sub Leeradc()
 Declare Sub Outsubsta(byval Datosta As Byte)
 Declare Sub Procdtmf()
-
+Declare Sub Proci2c()
+Declare Sub Defaultvalues()
 
 '*******************************************************************************
 'Declaracion de variables
@@ -101,7 +102,7 @@ Dim Volumen As Byte
 Dim Inileei2c As Bit
 Dim Cntrleci2c As Byte
 Dim Cntrtryi2c As Byte
-Dim Vali2c(4) As Byte
+Dim Vali2c(numi2c) As Byte
 
 Dim Tramatx(16) As Byte                                     'Trama de transmision
 Dim Tramatxdtmf(32) As Byte                                 ' Alamcena los codigos para generar los DTMF
@@ -168,6 +169,11 @@ Dim Cntrcrcokeep As Eram Word
 
 Dim Cntrcrcbad As Word
 Dim Cntrcrcbadeep As Eram Word
+
+Dim Topi2c(numi2c) As Byte
+Dim Topi2ceep(numi2c) As Eram Byte
+Dim Tmpi2c As Byte
+Dim Tmpcanal As Byte
 
 'Variables SERIAL0
 Dim Ser_ini As Bit , Sernew As Bit
@@ -338,7 +344,7 @@ Sub Inivar()
 Reset Led1
 Reset Rele
 Set Ce
-Print #1 , "************ DRIVER AUDIO ************"
+Print #1 , "************ RADIOBRIDGE ************"
 Print #1 , Version(1)
 Print #1 , Version(2)
 Print #1 , Version(3)
@@ -371,6 +377,25 @@ Print #1 , "CNTRCRCBAD=" ; Cntrcrcbad
 Volumen = 20
 Print #1 , "Vol=" ; Volumen
 
+For Tmpb = 1 To Numi2c
+   Topi2c(tmpb) = Topi2ceep(tmpb)
+   Print #1 , "TopI2C" ; Tmpb ; "=" ; Topi2c(tmpb)
+Next
+
+End Sub
+
+Sub Defaultvalues()
+   Adckeep(1) = 0.05494499
+   Adckeep(2) = 0.05494499
+   Adckeep(3) = 0.05494499
+   Numestacioneep = 14
+   Cntrtxeep = 0
+   Cntrcrcokeep = 0
+   Cntrcrcbadeep = 0
+   Topi2ceep(1) = 128
+   Topi2ceep(2) = 128
+   Topi2ceep(3) = 128
+   Topi2ceep(4) = 128
 End Sub
 
 
@@ -388,7 +413,21 @@ Sub Espera(byval Tespera As Word)
 End Sub
 
 
+Sub Proci2c()
+   For Tmpb = 1 To Numi2c
+      Tmpb2 = Tmpb - 1
+      If Vali2c(tmpb) < Topi2c(tmpb) Then
+         Reset Tmpi2c.tmpb2
+      Else
+         Set Tmpi2c.tmpb2
+      End If
+   Next
+   Print #1 , Bin(tmpi2c)
+
+End Sub
+
 Sub Gentrama()
+Print #1 , "Trama TX DTMF"
    Tramatx(1).0 = Numestacion.0
    Tramatx(1).1 = Numestacion.1
    Tramatx(1).2 = Numestacion.2
@@ -408,10 +447,11 @@ Sub Gentrama()
    Tramatx(6).1 = Substa.1
    Tramatx(6).2 = Substa.2
    Tramatx(6).3 = Substa.3
-   Tramatx(6).4 = Insta
-   Tramatx(6).5 = 0
-   Tramatx(6).6 = Outsta
-   Tramatx(6).7 = 0
+   Call Proci2c()
+   Tramatx(6).4 = Tmpi2c.0
+   Tramatx(6).5 = Tmpi2c.1
+   Tramatx(6).6 = Tmpi2c.2
+   Tramatx(6).7 = Tmpi2c.3
 
    Tramatx(7) = Vbat1
    Tramatx(8) = Vbat2
@@ -591,7 +631,7 @@ Sub Leersta()
          Reset Drvaudiook
          Statusant = Status
          Print #1 , "Nuevo Status Recibido por Radio=" ; Status
-         Set Inileei2c 
+         Set Inileei2c
          Select Case Status
             Case 1:
                Numani = 600
@@ -924,13 +964,7 @@ Sub Procser()
 
          Case "RSTVAR"
             Cmderr = 0
-            Adckeep(1) = 0.05494499
-            Adckeep(2) = 0.05494499
-            Adckeep(3) = 0.05494499
-            Numestacioneep = 14
-            Cntrtxeep = 0
-            Cntrcrcokeep = 0
-            Cntrcrcbadeep = 0
+            Call Defaultvalues()
             Atsnd = "Reinicio a valores por defecto"
             Set Inivariables
 
@@ -1015,9 +1049,9 @@ Sub Procser()
          Case "LEEI2C"
             If Numpar = 3 Then
                Tmpb = Val(cmdsplit(2))
-               If Tmpb < 4 Then
+               If Tmpb > 0 And Tmpb < Numi2c_masuno Then
                   Tmpb2 = Val(cmdsplit(3))
-                  Incr Tmpb
+                  'Incr Tmpb
                   Vali2c(tmpb) = Tmpb2
                   Atsnd = "Se conf I2C" + Str(tmpb) + "=" + Str(tmpb2)
                   Cmderr = 0
@@ -1032,7 +1066,7 @@ Sub Procser()
          Case "VALI2C"
             If Numpar = 2 Then
                Tmpb = Val(cmdsplit(2))
-               If Tmpb > 0 And Tmpb < 5 Then
+               If Tmpb > 0 And Tmpb < Numi2c_masuno Then
                   Cmderr = 0
                   Atsnd = "ValI2C " + Str(tmpb) + "=" + Str(vali2c(tmpb))
                Else
@@ -1041,6 +1075,37 @@ Sub Procser()
             Else
                Cmderr = 4
             End If
+
+         Case "TOPI2C"
+            If Numpar = 3 Then
+               Tmpb = Val(cmdsplit(2))
+               If Tmpb > 0 And Tmpb < Numi2c_masuno Then
+                  Cmderr = 0
+                  Topi2c(tmpb) = Val(cmdsplit(3))
+                  Topi2ceep(tmpb) = Topi2c(tmpb)
+                  Atsnd = "Se config top lim I2C" + Str(tmpb) + " a " + Str(topi2c(tmpb))
+               Else
+                  Cmderr = 5
+               End If
+            Else
+               Cmderr = 4
+            End If
+
+         Case "LEETOP"
+            If Numpar = 2 Then
+               If Tmpb > 0 And Tmpb < Numi2c_masuno Then
+                  Cmderr = 0
+                  Atsnd = "Top lim I2C" + Str(tmpb) + "=" + Str(topi2c(tmpb))
+               Else
+                  Cmderr = 5
+               End If
+            Else
+               Cmderr = 4
+            End If
+
+         Case "TMPI2C"
+            Cmderr = 0
+            Atsnd = "TmpI2C=" + Bin(tmpi2c)
 
          Case Else
             Cmderr = 1

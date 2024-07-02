@@ -745,11 +745,11 @@ Sub Procser()
          Case "LEEI2C"
             If Numpar = 2 Then
                Tmpb = Val(cmdsplit(2))
-               If Tmpb < 4 Then
+               If Tmpb > 0 And Tmpb < Numcanali2c_masuno Then
                   Set Leeri2c
                   Cmderr = 0
-                  Numcanal = Tmpb
-                  Atsnd = "Lectura ADC " + Str(numcanal)
+                  Numcanal = Tmpb - 1
+                  Atsnd = "Lectura ADC " + Str(tmpb) + " EN CANAL " + Str(numcanal)
                Else
                   Cmderr = 5
                End If

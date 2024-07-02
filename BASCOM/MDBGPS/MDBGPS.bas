@@ -202,7 +202,6 @@ Do
       For J = 1 To 72
          Print #1 , J ; "," ; Hex(holding_registers_table(j))
       Next
-
    End If
 
 Loop

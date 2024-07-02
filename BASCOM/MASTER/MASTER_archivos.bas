@@ -1545,12 +1545,12 @@ Sub Procdtmf()
 
        Tmpb = Tbl_rxdtmf(1)                                 'Numero de estacion
        Print #1 , "Estacion=" ; Tmpb
-       Tmptout = Input_registers_table(21)
+       Tmptout = Input_registers_table(numregtimeout)
        Kt = Tmpb - 1
        Reset Tmptout.kt
-       Input_registers_table(21) = Tmptout
-       J = 21
-       Input_registers_table(21) = Tmptout
+       Input_registers_table(Numregtimeout) = Tmptout
+       J = numregtimeout
+       Input_registers_table(Numregtimeout) = Tmptout
        Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
        Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
        Tbl_cntrtout(tmpb) = 0
@@ -1567,7 +1567,7 @@ Sub Procdtmf()
          End If
        End If
 
-       Tmphdr = Tbl_rxdtmf(2)
+       Tmphdr = Tbl_rxdtmf(2)                               'STATUS
        Ptrhdr = Tmpb - 1
        Ptrhdr = Ptrhdr \ 4
        Ptrhdr = Ptrhdr + 3
@@ -1669,6 +1669,7 @@ Sub Procdtmf()
 
 
        Tbl_stain(tmpb) = Tbl_rxhex(6)
+       Print #1 , "Tbl_rxhex(6)=" ; Bin(tbl_rxhex(6))
        Print #1 , "STAIN=" ; Hex(tbl_stain(tmpb))
 
        Atsnd = Atsnd + Str(tbl_rxdtmf(2)) + "," + Hex(tbl_stain(tmpb))
@@ -2036,7 +2037,7 @@ Sub Procmodbusreg()
 End Sub
 
 Sub Vertout()
-   Tmptout = Input_registers_table(21)
+   Tmptout = Input_registers_table(numregtimeout)
    For Jt = 1 To Numsta
       Incr Tbl_cntrtout(jt)
       If Tbl_cntrtout(jt) > Toptout Then
@@ -2045,9 +2046,9 @@ Sub Vertout()
          Tbl_cntrtout(jt) = 0
       End If
    Next
-   If Tmptout <> Input_registers_table(21) Then
-      J = 21
-      Input_registers_table(21) = Tmptout
+   If Tmptout <> Input_registers_table(numregtimeout) Then
+      J = Numregtimeout
+      Input_registers_table(Numregtimeout) = Tmptout
       Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
       Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
    End If

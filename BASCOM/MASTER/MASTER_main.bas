@@ -27,7 +27,7 @@
 
 
 
-$version 0 , 1 , 172
+$version 0 , 1 , 180
 $regfile = "m128def.dat"
 $crystal = 16000000
 $baud = 9600
@@ -36,7 +36,7 @@ $baud1 = 9600
 $hwstack = 128
 $swstack = 128
 $framesize = 128
-$projecttime = 136
+$projecttime = 142
 
 
 'Declaracion de constantes
@@ -46,7 +46,7 @@ Const Numadc = 3
 Const Tactadc = 900
 Const Tactadc_10 = Tactadc - 10
 
-Const Numregtimeout = 20
+Const Numregtimeout = 21
 
 
 'Const Modbus_slave_adress = 4
@@ -136,6 +136,11 @@ Enable Urxc1
 Enable Int4
 Config Int4 = Change
 On Int4 Pcint_int
+
+'ADC
+Config Adc = Single , Prescaler = Auto                      ', Reference = Internal
+Enable Adc
+Start Adc
 
 
 'Botones para Test, Normal , Alerta Naranja

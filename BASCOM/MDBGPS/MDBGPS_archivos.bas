@@ -60,6 +60,7 @@ Dim Statusrx As Byte
 
 Dim J As Byte
 Dim Tmpw As Word
+Dim Tmpw2 As Word
 
 Dim Tmpdw As Dword
 Dim Bdw1 As Byte At Tmpdw Overlay
@@ -146,7 +147,7 @@ Dim Topdelay As Word
 '************************************************************
 ' Variables definitions
 '************************************************************
-Dim Mbuf_rcv(120) As Byte
+Dim Mbuf_rcv(128) As Byte
 Dim Modbus_slave_adress_received As Byte At Mbuf_rcv(1) Overlay
 Dim Modbus_function As Byte At Mbuf_rcv(2) Overlay
 Dim Modbus_device_adress_hi As Byte At Mbuf_rcv(3) Overlay
@@ -165,11 +166,12 @@ Dim Mb_f15_data(8) As Byte At Mbuf_rcv(8) Overlay
 
 Dim Coil_status_table(5) As Byte                            ' One more than number_of_coils/8
 Dim Discrete_inputs_table(6) As Byte                        ' One more than number_of_inputs/8
-Dim Holding_registers_table(72) As Word
+Dim Holding_registers_table(numhr) As Word
 Dim Input_registers_table(32) As Word
 
 ' Genereal program use
 Dim For_loop As Byte
+Dim Consultatmp As Word
 
 Dim Dir_slave As Byte                                       'Mantiene la dirección del esclavo
 Dim Dir_slave_eep As Eram Byte

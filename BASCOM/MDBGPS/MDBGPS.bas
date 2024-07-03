@@ -19,7 +19,7 @@
 ' Test    - El Master envia comando de configuracion de Test de Audio y DRVLED
 ' Naranja - El Master envia comando de configuracion de estado de alarma
 
-$version 0 , 1 , 71
+$version 0 , 1 , 82
 $regfile = "m1284pdef.dat"
 $crystal = 16000000
 $baud = 9600
@@ -28,16 +28,20 @@ $baud1 = 9600
 $hwstack = 128
 $swstack = 128
 $framesize = 128
-$projecttime = 31
+$projecttime = 63
 
 
 'Declaracion de constantes
+Const Numregconsulta = 74
+Const Numhr = 74
+Const Numipr = 22
+
 Const Numsta = 11                                           'Numero de estaciones
 'Const Modbus_slave_adress = 4
 Const Maximum_coil_number = 2                               ' Keep in mind that modbus adress start at 0 so this is 16 coils !
 Const Maximum_discrete_inputs = 16                          ' Keep in mind that modbus adress start at 0 so this is 16 inputs !
-Const Maximum_holding_registers = 72                        ' Keep in mind that modbus adress start at 0 so this is 16 registers !
-Const Maximum_input_registers = 15                          ' Keep in mind that modbus adress start at 0 so this is 16 registers !
+Const Maximum_holding_registers = Numhr + 1                 ' Keep in mind that modbus adress start at 0 so this is 16 registers !
+Const Maximum_input_registers = Numipr + 1                  ' Keep in mind that modbus adress start at 0 so this is 16 registers !
 Const Maximum_adc_channel = 7                               ' Keep in mind that modbus adress start at 0 so this is 8 channels !
 '********************************************************************
 
@@ -199,9 +203,30 @@ Do
 
    If Inileerhr = 1 Then
       Reset Inileerhr
-      For J = 1 To 72
+      For J = 1 To Numhr
          Print #1 , J ; "," ; Hex(holding_registers_table(j))
       Next
+   End If
+
+   If Holding_registers_table(numregconsulta) <> Consultatmp Then
+      Print #1 , "Nueva consulta"
+      Tmpw2 = Holding_registers_table(numregconsulta)
+      Print #1 , Bin(tmpw2)
+      For J = 1 To 16
+         Tmpb2 = J - 1
+         If Tmpw2.tmpb2 <> Consultatmp.tmpb2 Then
+            If Tmpw2.tmpb2 = 1 Then
+               Print #1 , "Test en Esclavo " ; J
+               Print #1 , "$TSTSTA," ; J ; "," ; "2" ; ",4"
+
+            Else
+               Print #1 , "Normal en Esclavo " ; J
+               Print #1 , "$TSTSTA," ; J ; "," ; "1" ; ",4"
+            End If
+         End If
+      Next
+      Consultatmp = Holding_registers_table(numregconsulta)
+
    End If
 
 Loop

@@ -526,6 +526,8 @@ Sub Inivar()
       Input_registers_table(tmpb) = 0
    Next Tmpb
 
+   Input_registers_table(numregtimeout) = &B0000111111111111
+
    Dir_slave = Dir_slave_eep
    Print #1 , "Dir_Slave=" ; Dir_slave
    Trqs = Trqsnormal
@@ -574,6 +576,10 @@ Sub Inivar()
    Print #1 , "TactCLK=" ; Tactclk
    Toptout = Toptouteep
    Print #1 , "Toptout=" ; Toptout
+   For Adcn = 1 To Numadc
+      Adck(adcn) = Adckeep(adcn)
+      Print #1 , "Adck(" ; Adcn ; ")=" ; Adck(adcn)
+   Next
 
 
 
@@ -1416,7 +1422,6 @@ End Sub
 ' LEER ADC
 '*******************************************************************************
 Sub Leeradc()
-
    For Adcn = 1 To Numadc
       Adct = Lookup(adcn , Tbl_adc)
       Tmpwadc = Getadc(adct)                                'Valor instantaneo
@@ -1424,7 +1429,6 @@ Sub Leeradc()
       Adccntr(adcn) = Adccntr(adcn) + Tmpwadc
    Next
    Incr Cntrsmpl
-
    Cntrsmpl = Cntrsmpl Mod Numsample
    If Cntrsmpl = 0 Then
       For Adcn = 1 To Numadc
@@ -1437,10 +1441,8 @@ Sub Leeradc()
       Next
       Vbat = Adcval(1)
       Vps = Adcval(2)
-
+      'Vdc3 = Adcval(3)
    End If
-
-
 End Sub
 
 
@@ -1462,6 +1464,9 @@ Sub Defaultvalues()
    Cntrinieep = 0
    Tactclkeep = 3600
    Toptouteep = 3600
+   Adckeep(1) = 0.05494499
+   Adckeep(2) = 0.05494499
+   Adckeep(3) = 0.05494499
 End Sub
 
 Sub Procgps()
@@ -2029,6 +2034,11 @@ Sub Procmodbusreg()
       Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
       Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
       J = 20
+      Input_registers_table(j) = Vps4
+      Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+      Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
+
+      J = 21
       Input_registers_table(j) = Vps4
       Print #1 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))
       Print #2 , "$SETIPR," ; J ; "," ; Hex(input_registers_table(j))

@@ -123,6 +123,24 @@ Las entradas analógicas se utilizan para:
   Los registros Modbus utilizados se detallan en el siguiente documento:
 
   https://github.com/Ferivas/RADIOBRIDGE/blob/main/DOCS/MODBUS%20PUNTEROS%20HOLDING%20REGISTERS.pdf
+
+  ## SEÑALIZACION TIMEOUT EN REGISTRO MODBUS SATMASTER
+  El SATMASTER permite señalizar si las estaciones han dejado de trasnmitir luego de un tiempo que se configura en la variable *Toptout** la cual se puede configurar desde el MASTER con el siguiente comando
+
+  *SETTOU,TiempoTimeout* en donde el tiempo TiempoTout puede variar de 0 a 65535 segundos (3600s=1 hora es el valor por default)
+
+  Si se reinicia el master el registro IPR(20) que almacena los timeout pone en 1 (timeout) cada uno de los bits que corresponden a las estaciones. Cada bit se resetea a 0 si se recibe una respuesta válida ded un esclavo.
+
+  Para el leer el valor que está configurado por defecto se utiliza el comando
+
+  *LEETOU*
+
+  ## TRAMAS DE PRUEBA PARA EL MASTER
+  Prueba estación 5
+
+  $RXDTMF,05,01,00,00,00,00,00,08,00,04,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,02
+
+  
   
 
   

@@ -89,6 +89,8 @@ En BASCOM se debe programar con Arduino a 57600 como se muestra en la figura sig
 ## TARJETA MODBUS
 La tarjeta Modbus permite añadir un interfaz HMI para hacer test y señalizar el estado de las estaciones del SAT.
 En estas tarjetas es necesario quitar el D9 y cambiar la resistencia R11 por una resistencia de 0 ohm
+<img width="800" alt="Tarjeta Modbus" src="https://github.com/Ferivas/RADIOBRIDGE/blob/main/DOCS/MODBUS/tarjeta_MBDGPS.jpg">
+
 
 
 ## DRVLED SAT

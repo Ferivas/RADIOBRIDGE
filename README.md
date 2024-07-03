@@ -82,10 +82,15 @@ Los cambios se muestran en las dos figuras siguientes:
 
 <img width="1000" alt="Bugs DRVLED 2" src="https://github.com/Ferivas/RADIOBRIDGE/blob/main/DOCS/DRVLED_BUGHW2.jpg">
 
-## PROGRAMAMCION CON AVRDUDE
+## PROGRAMACION CON AVRDUDE
 Si se graba el bootloader URboot en los ATmega, se puede programarlos con un Raspberry donde se instalo avrdude utilizando esta línea de comando
 
 *avrdude -p m1284p -c arduino -P /dev/ttyUSB0 -b 57600 -F -D -U flash:w:MBDGPS.hex -v*
+
+En BASCOM se debe programar con Arduino a 57600 como se muestra en la figura siguiente 
+
+<img width="600" alt="Prog BASCOM" src="https://github.com/Ferivas/RADIOBRIDGE/blob/main/DOCS/Config_Prog_Urboot_M1284P.jpg">
+
 
 ## AMPLIFICADOR DE AUDIO
 ### Interfaz I2C
@@ -113,6 +118,12 @@ Las entradas analógicas se utilizan para:
   *SETI2C,Valor*
 
   En donde valor varía entre 0 y 255
+
+  ### REGISTROS MODBUS
+  Los registros Modbus utilizados se detallan en el siguiente documento:
+
+  https://github.com/Ferivas/RADIOBRIDGE/blob/main/DOCS/MODBUS%20PUNTEROS%20HOLDING%20REGISTERS.pdf
+  
 
   
  

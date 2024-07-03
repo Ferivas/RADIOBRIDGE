@@ -1,7 +1,8 @@
- # RADIOBRIDGE
+# SISTEMA DE ALERTA TEMPRANA
 Documentación RadioBridge 
 
-## BUGS HARDWARE
+## TARJETA RADIOBRIDGE
+### BUGS HARDWARE
 En el header de programación JP1 hay que intercambiar los pines de programación JP1-5 y JP1-6 que corresponden a las líneas RXD0 y TXD0 para que sea compatible con la configuración estándar. Se soluciono este bug con un adaptador que intercambaio estas dos líneas.<br>
 
 El mosfet Q1 (SI2301CDS) es de tipo P. Se cambia por un mosfet N (FDN357).
@@ -12,7 +13,7 @@ Se montan CN2, CN3 y CN6 (no había stock en JLCPCB). Hay también que soldar un
 
 <img width="1000" alt="Bugs HW" src="https://github.com/Ferivas/RADIOBRIDGE/blob/main/DOCS/Bug_HW.jpg">
 
-## PROGRAMACION BOOTLOADER
+### PROGRAMACION BOOTLOADER
 Utilizando un programador ISP compatibles con USBASP https://www.fischl.de/usbasp/  se carga este programa teniendo en cuenta que los pines de RXDO y TXDO se encuentran ionvertidos por los que se uyiliza un adapatador como el mostrado en https://github.com/Ferivas/RADIOBRIDGE/blob/main/DOCS/Bug_HW.jpg
 
 El programa que hay que utilizar es https://github.com/Ferivas/RADIOBRIDGE/blob/main/BASCOM/Bootloader/BootLoaderATMEGA128A_PC5_16MHz.hex el cual es el bootloader de MCS electronics (AVR BAscom) configurado a 38400 bps.
@@ -21,33 +22,33 @@ En el BASCOM se escoge la opción de "USBASP programmer" y cuando se programa el
 <img width="1000" alt="Bugs HW" src="https://github.com/Ferivas/RADIOBRIDGE/blob/main/BASCOM/Bootloader/Fuses_USBASP.jpg">
 
 
-## PROGRAMACION NORMAL
+### PROGRAMACION NORMAL
 Las actualizaciones de programa se instalan por el puerto serial con un  cable USB micro en el conector USB1 de la tarjeta. Se utiliza el BASCOM o el programa Bootloader de MCSelectronics ( https://www.mcselec.com/index.php?option=com_docman&task=doc_download&gid=153&Itemid=54 ) 
 Se escoge el puerto detectado en la PC a la velocidad de 38400bps y se descarga este programa https://github.com/Ferivas/RADIOBRIDGE/blob/main/BASCOM/MAINBOARD/RadioBridge_M128.hex
 
-## COMANDOS IMPORTANTES RADIOBRIDGE
-### CONFIGURACION INICIAL
+### COMANDOS IMPORTANTES RADIOBRIDGE
+#### CONFIGURACION INICIAL
 Es necesario inicializar el equipo a los valores por defecto. Para est se utiliza el puerto serial configurado a 9600, 8,N,1 y con un programa terminal (se recomienda Hterm) se ingresa el siguiente comando<br>
 *$RSTVAR*
 
-### CONFIGURACION DEL NUMERO DE ESTACION
+#### CONFIGURACION DEL NUMERO DE ESTACION
 Una vez programada la tarjeta el número de estación se puede configurar por el puerto serial configurado a 9600, 8,N,1 con <br>
 
 *$setsta,Numestacion*
 
-### ALMACENAMIENTO DE LOS CANALES ADC DEL DISPOSITIVO I2C DE DRVAUDIO
+#### ALMACENAMIENTO DE LOS CANALES ADC DEL DISPOSITIVO I2C DE DRVAUDIO
 Para configurar los valores de los parámetros I2C se utiliza el comando
 
 *LEEI2C,Numcanal;Valcanal*
 
 Este comando se recibe de la tarjeta del DRVAUDIO y almacena los valores de los canlaes ADC del dispositvo I2C del DRVAUDIO en una tabla Vali2c(4) que alamcena estos valores para comparar. Numcanal varía entre 1 y 4
 
-### LECTURA DE LOS VALORES DE LOS CANALES ADC DEL DISPOSITIVO I2C DE DRVAUDIO
+#### LECTURA DE LOS VALORES DE LOS CANALES ADC DEL DISPOSITIVO I2C DE DRVAUDIO
 *VALI2C,Numcanal*
 
 Numcanal varia entre 1 y 4
 
-### CONFIGURACION DE VALORES DE COMPARACION DE CANALES ADC
+#### CONFIGURACION DE VALORES DE COMPARACION DE CANALES ADC
 Para poder trasnmitir el estado de los canales ADC se compara el valor recibido del DRVAUDIO con un valor previamente configurado en el RADIOBRIDGE, de manera que se pueda configurar bits si el valor leído del DRVAUDIO es mayor o menor que este valor de compración. Para esto se utiliza el comando
 
 *TOPI2C,Canal;Valor*
@@ -57,8 +58,9 @@ Y para leer estos valores configurados se utiliza el comando
 *LEETOP,Canal*
 
 
-
-## PRUEBAS ESCLAVOS DESDE MASTER
+## MASTER
+El Master se implementa con un RadioBridge y una tarjeta adicional que maneja el Modbus
+### PRUEBAS ESCLAVOS DESDE MASTER
 Desde el Hterm enviar el siguiente comando a 9600,8,N,1
 
 *$tststa,Numestacion,1,10*
@@ -68,6 +70,26 @@ donde Numestacion puede variar de 1 a 9
 El número de estación actual se puede consultar con <br>
 
 *$leesta*
+
+  ### TRAMAS DE PRUEBA PARA EL MASTER
+  Prueba estación 5
+
+### PROGRAMACION CON AVRDUDE
+Si se graba el bootloader URboot en los ATmega, se puede programarlos con un Raspberry donde se instalo avrdude utilizando esta línea de comando
+
+*avrdude -p m1284p -c arduino -P /dev/ttyUSB0 -b 57600 -F -D -U flash:w:MBDGPS.hex -v*
+
+En BASCOM se debe programar con Arduino a 57600 como se muestra en la figura siguiente 
+
+<img width="600" alt="Prog BASCOM" src="https://github.com/Ferivas/RADIOBRIDGE/blob/main/DOCS/Config_Prog_Urboot_M1284P.jpg">
+  
+
+  $RXDTMF,05,01,00,00,00,00,00,08,00,04,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,02
+
+## TARJETA MODBUS
+La tarjeta Modbus permite añadir un interfaz HMI para hacer test y señalizar el estado de las estaciones del SAT.
+En estas tarjetas es necesario quitar el D9 y cambiar la resistencia R11 por una resistencia de 0 ohm
+
 
 ## DRVLED SAT
 Se fabrico tarjeta en JLCPCB. se encontró que la posición del conector de temperatura y GPS estaban intercambiados por lo que fue necesario hacer los siguientes cambios:
@@ -82,14 +104,6 @@ Los cambios se muestran en las dos figuras siguientes:
 
 <img width="1000" alt="Bugs DRVLED 2" src="https://github.com/Ferivas/RADIOBRIDGE/blob/main/DOCS/DRVLED_BUGHW2.jpg">
 
-## PROGRAMACION CON AVRDUDE
-Si se graba el bootloader URboot en los ATmega, se puede programarlos con un Raspberry donde se instalo avrdude utilizando esta línea de comando
-
-*avrdude -p m1284p -c arduino -P /dev/ttyUSB0 -b 57600 -F -D -U flash:w:MBDGPS.hex -v*
-
-En BASCOM se debe programar con Arduino a 57600 como se muestra en la figura siguiente 
-
-<img width="600" alt="Prog BASCOM" src="https://github.com/Ferivas/RADIOBRIDGE/blob/main/DOCS/Config_Prog_Urboot_M1284P.jpg">
 
 
 ## AMPLIFICADOR DE AUDIO
@@ -119,12 +133,12 @@ Las entradas analógicas se utilizan para:
 
   En donde valor varía entre 0 y 255
 
-  ### REGISTROS MODBUS
+  ## REGISTROS MODBUS
   Los registros Modbus utilizados se detallan en el siguiente documento:
 
   https://github.com/Ferivas/RADIOBRIDGE/blob/main/DOCS/MODBUS%20PUNTEROS%20HOLDING%20REGISTERS.pdf
 
-  ## SEÑALIZACION TIMEOUT EN REGISTRO MODBUS SATMASTER
+  ### SEÑALIZACION TIMEOUT EN REGISTRO MODBUS SATMASTER
   El SATMASTER permite señalizar si las estaciones han dejado de trasnmitir luego de un tiempo que se configura en la variable *Toptout** la cual se puede configurar desde el MASTER con el siguiente comando
 
   *SETTOU,TiempoTimeout* en donde el tiempo TiempoTout puede variar de 0 a 65535 segundos (3600s=1 hora es el valor por default)
@@ -135,10 +149,7 @@ Las entradas analógicas se utilizan para:
 
   *LEETOU*
 
-  ## TRAMAS DE PRUEBA PARA EL MASTER
-  Prueba estación 5
 
-  $RXDTMF,05,01,00,00,00,00,00,08,00,04,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,02
 
   
   

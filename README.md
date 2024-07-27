@@ -71,6 +71,12 @@ El número de estación actual se puede consultar con <br>
 
 *$leesta*
 
+### CONFIGURACION TIEMPO DE TX EN ESTADO NORMAL
+*$SETTXN,Tiempotxn* <br>
+En donde Tiempotxn es el tiempo de tx en estado normal en segundos<br>
+Para leer el valor configurado <br>
+*$LEETXN,Tiempotxn*
+
   ### TRAMAS DE PRUEBA PARA EL MASTER
   Prueba estación 5
 

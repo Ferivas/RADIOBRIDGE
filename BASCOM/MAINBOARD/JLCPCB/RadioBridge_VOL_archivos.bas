@@ -290,13 +290,13 @@ Int_timer0:
 
    If Inirst = 1 Then
       'Reset Inirst
-      Set Pinbug
+      'Set Pinbug
       Incr Cntrrst
       Cntrrst = Cntrrst Mod 500
       If Cntrrst = 0 Then
          Ptrrxdtmf = 0
          Reset Inirst
-         Reset Pinbug
+         'Reset Pinbug
       End If
    End If
 

@@ -19,7 +19,7 @@
 ' Test    - El Master envia comando de configuracion de Test de Audio y DRVLED
 ' Naranja - El Master envia comando de configuracion de estado de alarma
 
-$version 0 , 1 , 82
+$version 0 , 1 , 91
 $regfile = "m1284pdef.dat"
 $crystal = 16000000
 $baud = 9600
@@ -28,12 +28,13 @@ $baud1 = 9600
 $hwstack = 128
 $swstack = 128
 $framesize = 128
-$projecttime = 63
+$projecttime = 74
 
 
 'Declaracion de constantes
 Const Numregconsulta = 74
-Const Numhr = 74
+Const Numregvolumen = 75
+Const Numhr = 75
 Const Numipr = 22
 
 Const Numsta = 11                                           'Numero de estaciones
@@ -217,15 +218,24 @@ Do
          If Tmpw2.tmpb2 <> Consultatmp.tmpb2 Then
             If Tmpw2.tmpb2 = 1 Then
                Print #1 , "Test en Esclavo " ; J
-               Print #1 , "$TSTSTA," ; J ; "," ; "2" ; ",4"
+               Print #1 , "$TSTSTA," ; J ; "," ; "2" ; "," ; Volumentmp
 
             Else
                Print #1 , "Normal en Esclavo " ; J
-               Print #1 , "$TSTSTA," ; J ; "," ; "1" ; ",4"
+               Print #1 , "$TSTSTA," ; J ; "," ; "1" ; "," ; Volumentmp
             End If
          End If
       Next
       Consultatmp = Holding_registers_table(numregconsulta)
+   End If
+
+   If Holding_registers_table(numregvolumen) <> Volumentmp Then
+      Volumentmp = Holding_registers_table(numregvolumen)
+      Print #1 , "Nuevo Volumen" ; Volumentmp
+      If Volumentmp > 30 Then
+         Volumentmp = 29
+      End If
+      Volumentmpeep = Volumentmp
 
    End If
 

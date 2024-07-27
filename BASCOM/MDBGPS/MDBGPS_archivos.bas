@@ -172,9 +172,12 @@ Dim Input_registers_table(32) As Word
 ' Genereal program use
 Dim For_loop As Byte
 Dim Consultatmp As Word
+Dim Volumentmp As Word
 
 Dim Dir_slave As Byte                                       'Mantiene la dirección del esclavo
 Dim Dir_slave_eep As Eram Byte
+
+Dim Volumentmpeep As Eram Word
 
 '
 
@@ -324,6 +327,17 @@ Next For_loop
 
 Dir_slave = Dir_slave_eep
 Print #1 , "Dir_Slave=" ; Dir_slave
+
+Volumentmp = Volumentmpeep
+Print #1 , "Volumen=" ; Volumentmp
+
+If Volumentmp > 30 Then
+   Volumentmp = 10
+   Volumentmpeep = Volumentmp
+End If
+
+Holding_registers_table(numregvolumen) = Volumentmp
+
 
 
 End Sub
@@ -805,6 +819,24 @@ Sub Procser()
                Else
                   Cmderr = 5
                End If
+            Else
+               Cmderr = 4
+            End If
+
+         Case "LEEVOL"
+            Cmderr = 0
+            Atsnd = "Volumen=" + Str(volumentmp)
+
+         Case "SETVOL"
+            If Numpar = 2 Then
+               Cmderr = 0
+               Volumentmp = Val(cmdsplit(2))
+               If Volumentmp > 30 Then
+                  Volumentmp = 29
+               End If
+               Volumentmpeep = Volumentmp
+               Atsnd = "Se config VOL=" + Str(volumentmp)
+
             Else
                Cmderr = 4
             End If

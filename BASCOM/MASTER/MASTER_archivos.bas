@@ -1679,6 +1679,7 @@ Sub Procdtmf()
 
        Atsnd = Atsnd + Str(tbl_rxdtmf(2)) + "," + Hex(tbl_stain(tmpb))
        Print #1 , Atsnd
+       Print #2 , Atsnd 
 
        Tmphdr = Tbl_rxhex(6)
        Ptrhdr = Tmpb - 1

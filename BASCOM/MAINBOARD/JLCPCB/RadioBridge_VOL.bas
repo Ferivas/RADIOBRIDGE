@@ -19,7 +19,7 @@
 ' Test    - El Master envia comando de configuracion de Test de Audio y DRVLED
 ' Naranja - El Master envia comando de configuracion de estado de alarma
 
-$version 0 , 1 , 316
+$version 0 , 1 , 317
 $regfile = "m128def.dat"
 $crystal = 16000000
 $baud = 9600
@@ -56,8 +56,8 @@ Config Ledrx = Output
 Ptt Alias Portg.2                                           ' PTT Radio
 Config Ptt = Output
 
-Pinbug Alias Portb.1
-Config Pinbug = Output
+'Pinbug Alias Portb.1
+'Config Pinbug = Output
 
 
 'CONTROL Generador DTMF HT9200B

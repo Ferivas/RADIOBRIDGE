@@ -27,7 +27,7 @@
 
 
 
-$version 0 , 1 , 180
+$version 0 , 1 , 181
 $regfile = "m128def.dat"
 $crystal = 16000000
 $baud = 9600

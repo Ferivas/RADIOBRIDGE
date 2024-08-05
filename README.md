@@ -57,6 +57,9 @@ Y para leer estos valores configurados se utiliza el comando
 
 *LEETOP,Canal*
 
+### PRUEBA HW TX Y RX DE TONOS DTMF
+Para este fin es necesario cortocircuitar temporalmente los terminales de los capacitores C27 y C29 en el caso del tarjeta RAdiobrige fabricada por JLCPCB en China (basada en el M128A).<br>
+En el caso de las tarjetas antiguas se deben cortocircuitar los capacitores C18 (en la parte frontal) y C13 (en la parte poterior) de estas tarjetas.
 
 ## MASTER
 El Master se implementa con un RadioBridge y una tarjeta adicional que maneja el Modbus

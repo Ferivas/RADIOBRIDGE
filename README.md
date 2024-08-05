@@ -28,7 +28,7 @@ Se escoge el puerto detectado en la PC a la velocidad de 38400bps y se descarga 
 
 ### COMANDOS IMPORTANTES RADIOBRIDGE
 #### CONFIGURACION INICIAL
-Es necesario inicializar el equipo a los valores por defecto. Para est se utiliza el puerto serial configurado a 9600, 8,N,1 y con un programa terminal (se recomienda Hterm) se ingresa el siguiente comando<br>
+Es necesario inicializar el equipo a los valores por defecto. Para esto se utiliza el puerto serial configurado a 9600, 8,N,1 y con un programa terminal (se recomienda Hterm) se ingresa el siguiente comando<br>
 *$RSTVAR*
 
 #### CONFIGURACION DEL NUMERO DE ESTACION
@@ -59,7 +59,11 @@ Y para leer estos valores configurados se utiliza el comando
 
 ### PRUEBA HW TX Y RX DE TONOS DTMF
 Para este fin es necesario cortocircuitar temporalmente los terminales de los capacitores C27 y C29 en el caso del tarjeta RAdiobrige fabricada por JLCPCB en China (basada en el M128A).<br>
+<img width="1000" alt="Test DTMF" src="https://github.com/Ferivas/RADIOBRIDGE/blob/main/DOCS/RADIOBRIDGE/TSTRDB_DTMF.jpg">
+
 En el caso de las tarjetas antiguas se deben cortocircuitar los capacitores C18 (en la parte frontal) y C13 (en la parte poterior) de estas tarjetas.
+<img width="800" alt="Test DTMF anterior" src="https://github.com/Ferivas/RADIOBRIDGE/blob/main/DOCS/RADIOBRIDGE/TSTRDB_DTMF_antiguo_frontal.jpg">
+<img width="800" alt="Test DTMF anterior posterior" src="https://github.com/Ferivas/RADIOBRIDGE/blob/main/DOCS/RADIOBRIDGE/TSTRDB_DTMF_antiguo_posterior.jpg">
 
 ## MASTER
 El Master se implementa con un RadioBridge y una tarjeta adicional que maneja el Modbus

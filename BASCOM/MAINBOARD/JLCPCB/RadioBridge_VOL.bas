@@ -19,7 +19,7 @@
 ' Test    - El Master envia comando de configuracion de Test de Audio y DRVLED
 ' Naranja - El Master envia comando de configuracion de estado de alarma
 
-$version 0 , 1 , 317
+$version 0 , 1 , 323
 $regfile = "m128def.dat"
 $crystal = 16000000
 $baud = 9600
@@ -28,6 +28,7 @@ $baud1 = 9600
 $hwstack = 128
 $swstack = 128
 $framesize = 128
+$projecttime = 6
 
 
 'Declaracion de constantes
@@ -242,6 +243,13 @@ Do
             Substa = 1
          End If
       End If
+   End If
+
+   If Newmsg = 1 Then
+      Reset Newmsg
+      Print #1 , "$SETMSG," ; Tmpmsg ; "," ; Volumen
+      Print #2 , "$SETMSG," ; Tmpmsg ; "," ; Volumen
+
    End If
 
 

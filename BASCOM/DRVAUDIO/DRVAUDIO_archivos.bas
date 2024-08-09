@@ -8,6 +8,7 @@
 '* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 $nocompile
+$projecttime = 0
 
 
 '*******************************************************************************
@@ -102,6 +103,8 @@ Dim Londata1 As Byte
 Dim Loncmd As Byte
 
 Dim Volumen As Byte
+Dim Volumentst As Byte
+Dim Volumeneep As Eram Byte
 
 'Variables SERIAL0
 Dim Ser_ini As Bit , Sernew As Bit
@@ -253,24 +256,25 @@ Return
 ' Inicialización de variables
 '*******************************************************************************
 Sub Inivar()
-Set Pwrmp3
-Reset Led1
-Reset Ena1
-Reset Ena2
-
-Print #1 , "************ DRIVER AUDIO ************"
-Print #1 , Version(1)
-Print #1 , Version(2)
-Print #1 , Version(3)
-
+   Set Pwrmp3
+   Reset Led1
+   Reset Ena1
+   Reset Ena2
+   Print #1 , "************ DRIVER AUDIO ************"
+   Print #1 , Version(1)
+   Print #1 , Version(2)
+   Print #1 , Version(3)
    Tblcmdfp(1) = &H7E
    Tblcmdfp(2) = &HFF
-
-Estado_led = 1
+   Estado_led = 1
    Status = Statuseep
    Status = 1
    Print #1 , "Estado=" ; Status
-
+   Volumentst = Volumeneep
+   If Volumentst > 30 Then
+      Volumentst = 30
+   End If
+   Print #1 , "VOLtst=" ; Volumentst
 End Sub
 
 '*******************************************************************************
@@ -836,6 +840,23 @@ Sub Procser()
          Case "LEEMIN"
             Cmderr = 0
             Atsnd = "Cntrmin " + Str(cntrmin)
+
+         Case "SETVOL"
+            If Numpar = 2 Then
+               Cmderr = 0
+               Volumentst = Val(cmdsplit(2))
+               If Volumentst > 30 Then
+                  Volumentst = 30
+               End If
+               Volumeneep = Volumentst
+               Atsnd = "Se conf VOL=" + Str(Volumentst)
+            Else
+               Cmderr = 4
+            End If
+
+         Case "LEEVOL"
+            Cmderr = 0
+            Atsnd = "VOL=" + Str(volumen)
 
 
          Case Else

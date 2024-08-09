@@ -27,7 +27,7 @@
 
 
 
-$version 0 , 1 , 181
+$version 0 , 1 , 192
 $regfile = "m128def.dat"
 $crystal = 16000000
 $baud = 9600
@@ -36,7 +36,7 @@ $baud1 = 9600
 $hwstack = 128
 $swstack = 128
 $framesize = 128
-$projecttime = 142
+$projecttime = 157
 
 
 'Declaracion de constantes
@@ -47,6 +47,8 @@ Const Tactadc = 900
 Const Tactadc_10 = Tactadc - 10
 
 Const Numregtimeout = 21
+Const Nummsg = 8
+Const Nummsg_masuno = Nummsg + 1
 
 
 'Const Modbus_slave_adress = 4
@@ -207,8 +209,6 @@ Do
       Print #1 , "CLK>" ; Time$ ; "," ; Date$
    End If
 
-
-
    If Iniprog = 1 Then
       Print #1 , "Ini modo Prog"
       Tmpprg = Estado_led
@@ -238,6 +238,13 @@ Do
    If Newtst = 1 Then
       Reset Newtst
       Call Proctest()
+   End If
+
+   If Newmsg = 1 Then
+      Reset Newmsg
+      Print #1 , "New TX MSG No. " ; Msgtmp ; " a Esclavo " ; Statst ; " con vol " ; Volumen
+      Call Txmsg()
+
    End If
 
    If Newdv = 1 Then

@@ -8,6 +8,7 @@
 '* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 $nocompile
+$projecttime = 47
 
 
 '*******************************************************************************
@@ -16,8 +17,8 @@ $nocompile
 Declare Sub Inivar()
 Declare Sub Procser()
 Declare Sub Espera(byval Tespera As Word)
-Declare Sub Gentrama()
-Declare Sub Rxdtmf()                                        'Recibe tonos DTMF
+Declare Sub Gentrama(byval Tipotram As Byte)
+'Declare Sub Rxdtmf()                                        'Recibe tonos DTMF
 Declare Sub Txdtmf()                                        'Transmite tonos DTMF
 Declare Sub Leersta()
 Declare Sub Leeradc()
@@ -33,6 +34,7 @@ Declare Sub Txnormal()
 Declare Sub Procmodbusreg()
 Declare Sub Vertout()
 Declare Sub Vercfg()
+Declare Sub Txmsg()
 
 '*******************************************************************************
 'Declaracion de variables
@@ -259,7 +261,8 @@ Dim Toptouteep As Eram Word
 Dim Cfgokeep As Eram Byte
 Dim Cfgok As Byte
 
-
+Dim Msgtmp As Byte
+Dim Newmsg As Bit
 '
 
 'Variables SERIAL0
@@ -628,10 +631,20 @@ Sub Espera(byval Tespera As Word)
 End Sub
 
 
-Sub Gentrama()
+Sub Gentrama(byval Tipotram As Byte)
 
    Tramatx(1) = &H24                                        '$ como identificador de cabecera
-   Tramatx(2) = &H55                                        'Identificación del master
+   If Tipotram = 0 Then
+      Tramatx(2) = &H55                                     'Identificación del master
+   End If
+
+   If Tipotram = 1 Then
+      Msgtmp = Msgtmp And &H0F
+      Print #1 , Hex(msgtmp)
+
+      Tramatx(2) = Msgtmp Or &HF0                           'Identificación del master
+      Print #1 , Hex(tramatx(2))
+   End If
 
    Tramatx(3).0 = Cntrestaciones.0
    Tramatx(3).1 = Cntrestaciones.1
@@ -726,24 +739,24 @@ End Sub
 '*******************************************************************************
 ' Subrutina de rx de datos DTMF
 '*******************************************************************************
-Sub Rxdtmf()
+'Sub Rxdtmf()
 
-   If Dv = 1 Then
-      Tonodtmf = Pind
-      Shift Tonodtmf , Right , 4
-      Print #1 , "T=" ; Hex(tonodtmf)
-      Incr Ptrrxdtmf
-      Tbl_rxdtmf(ptrrxdtmf) = Tonodtmf
-      Ptrrxdtmf = Ptrrxdtmf Mod 12
-      If Ptrrxdtmf = 0 Then
-         Print #1 , "rx="
-         For J = 1 To 12
-            Print #1 , J ; "," ; Hex(tbl_rxdtmf(j))
-         Next
-      End If
-   End If
+'   If Dv = 1 Then
+'      Tonodtmf = Pind
+'      Shift Tonodtmf , Right , 4
+'      Print #1 , "T=" ; Hex(tonodtmf)
+'      Incr Ptrrxdtmf
+'      Tbl_rxdtmf(ptrrxdtmf) = Tonodtmf
+'      Ptrrxdtmf = Ptrrxdtmf Mod 12
+'      If Ptrrxdtmf = 0 Then
+'         Print #1 , "rx="
+'         For J = 1 To 12
+'            Print #1 , J ; "," ; Hex(tbl_rxdtmf(j))
+'         Next
+'      End If
+'   End If
 
-End Sub
+'End Sub
 
 
 '*******************************************************************************
@@ -1220,7 +1233,7 @@ Sub Procser()
 
          Case "TSTSTA"
             If Numpar = 4 Then
-                Statst = Val(cmdsplit(2))
+               Statst = Val(cmdsplit(2))
                If Statst < 12 Then
                   Estadotst = Val(cmdsplit(3))
                   If Estadotst < 4 Then
@@ -1228,6 +1241,26 @@ Sub Procser()
                      Cmderr = 0
                      Atsnd = "TST Tx Estacion=" + Str(statst) + " , STATUS=" + Str(estadotst) + ", VOL=" + Str(volumen)
                      Set Newtst
+                  Else
+                     Cmderr = 6
+                  End If
+               Else
+                  Cmderr = 5
+               End If
+            Else
+               Cmderr = 4
+            End If
+
+         Case "SETMSG"
+            If Numpar = 4 Then
+               Statst = Val(cmdsplit(2))
+               If Statst < 12 Then
+                  Msgtmp = Val(cmdsplit(3))
+                  If Msgtmp < Nummsg_masuno Then
+                     Volumen = Val(cmdsplit(4))
+                     Cmderr = 0
+                     Set Newmsg
+                     Atsnd = "Tx MSG No." + Str(msgtmp) + "a estacion " + Str(statst) + " con vol " + Str(volumen)
                   Else
                      Cmderr = 6
                   End If
@@ -1679,7 +1712,7 @@ Sub Procdtmf()
 
        Atsnd = Atsnd + Str(tbl_rxdtmf(2)) + "," + Hex(tbl_stain(tmpb))
        Print #1 , Atsnd
-       Print #2 , Atsnd 
+       Print #2 , Atsnd
 
        Tmphdr = Tbl_rxhex(6)
        Ptrhdr = Tmpb - 1
@@ -1739,7 +1772,7 @@ Sub Proctest()
    Cntrestaciones = Statst
    Tmpstatus = Status
    Status = Estadotst
-   Call Gentrama()
+   Call Gentrama(0)
    Print #1 , "Trama HEX"
    For J = 1 To 10
       Print #1 , Hex(tramatx(j)) ; ",";
@@ -1843,7 +1876,7 @@ Sub Txslaves()
       Print #2 , Tmpstr52
    End If
 
-   Call Gentrama()
+   Call Gentrama(0)
    Print #1 , "Trama HEX"
    For J = 1 To 10
       Print #1 , Hex(tramatx(j)) ; ",";
@@ -1873,7 +1906,7 @@ Sub Txalerta()
       Print #2 , "$SETIPR," ; "12" ; "," ; Hex(input_registers_table(12))
       Tmpcntrsta = Cntrestaciones
       Cntrestaciones = &H0F
-      Call Gentrama()
+      Call Gentrama(0)
       Print #1 , "Trama HEX"
       For J = 1 To 10
          Print #1 , Hex(tramatx(j)) ; ",";
@@ -1915,7 +1948,7 @@ Sub Txtest()
       Input_registers_table(12) = Status
       Print #1 , "$SETIPR," ; "12" ; "," ; Hex(input_registers_table(12))
       Print #2 , "$SETIPR," ; "12" ; "," ; Hex(input_registers_table(12))
-      Call Gentrama()
+      Call Gentrama(0)
       Print #1 , "Trama HEX"
       For J = 1 To 10
          Print #1 , Hex(tramatx(j)) ; ",";
@@ -1967,7 +2000,7 @@ Sub Txnormal()
       End If
 
 
-      Call Gentrama()
+      Call Gentrama(0)
       Print #1 , "Trama HEX"
       For J = 1 To 10
          Print #1 , Hex(tramatx(j)) ; ",";
@@ -1998,6 +2031,37 @@ Sub Txnormal()
    End If
 
 End Sub
+
+Sub Txmsg()
+   Print #1 , "NEW TX MSG a Estacion " ; Statst
+   Print #1 , Time$ ; ";" ; Date$
+   Input_registers_table(11) = Statst
+   Input_registers_table(12) = Status
+   'Print #1 , "$SETIPR," ; "12" ; "," ; Hex(input_registers_table(12))
+   Tmpstr52 = "$SETIPR," + "12" + "," + Hex(input_registers_table(12))
+   Print #1 , Tmpstr52
+   Print #2 , Tmpstr52
+   Cntrestaciones = Statst
+   Call Gentrama(1)
+   Print #1 , "Trama HEX"
+   For J = 1 To 10
+      Print #1 , Hex(tramatx(j)) ; ",";
+   Next
+   Print #1,
+   Print #1 , "Trama DTMF"
+   Print #1 , "$RXDTMF";
+   For J = 1 To 20
+      Print #1 , "," ; Hex(tramatxdtmf(j)) ;
+   Next
+   Print #1,
+   Call Txdtmf()
+   Incr Cntrtx
+   Cntrtxeep = Cntrtx
+   Print #1 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; Tmpstr8 ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
+   Print #2 , "$SETMST,," ; Status ; "," ; Cntrtx ; "," ; Tmpstr8 ; "," ; Cntrcrcok ; "," ; Cntrcrcbad ; "," ; Cntrini
+
+End Sub
+
 
 Sub Procmodbusreg()
    Incr Cntripadc

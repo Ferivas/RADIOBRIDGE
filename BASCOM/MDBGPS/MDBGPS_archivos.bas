@@ -8,7 +8,7 @@
 '* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 $nocompile
-
+$projecttime = 9
 
 '*******************************************************************************
 'Declaracion de subrutinas
@@ -173,12 +173,14 @@ Dim Input_registers_table(32) As Word
 Dim For_loop As Byte
 Dim Consultatmp As Word
 Dim Volumentmp As Word
+Dim Numregtxmsgtmp As Word
+Dim Msgtmp As Word
 
 Dim Dir_slave As Byte                                       'Mantiene la dirección del esclavo
 Dim Dir_slave_eep As Eram Byte
 
 Dim Volumentmpeep As Eram Word
-
+Dim Msgtmpeep As Eram Word
 '
 
 'Variables SERIAL0
@@ -302,44 +304,49 @@ Return
 ' Inicialización de variables
 '*******************************************************************************
 Sub Inivar()
-Reset Led1
+   Reset Led1
 
-Statusrx = 1
-Print #1 , "MDBGPS RTU BRIDGE 2024"
-Print #1 , Version(1)
-Print #1 , Version(2)
-Print #1 , Version(3)
-Estado_led = 1
-Status = 1
-
-
-
-Coil_status_table(1) = 0
-Coil_status_table(2) = 0
-Coil_status_table(3) = 0
-Coil_status_table(4) = 0
-Coil_status_table(5) = 0
-
-For For_loop = 1 To 32
-   Holding_registers_table(for_loop) = For_loop
-   Input_registers_table(for_loop) = For_loop
-Next For_loop
-
-Dir_slave = Dir_slave_eep
-Print #1 , "Dir_Slave=" ; Dir_slave
-
-Volumentmp = Volumentmpeep
-Print #1 , "Volumen=" ; Volumentmp
-
-If Volumentmp > 30 Then
-   Volumentmp = 10
-   Volumentmpeep = Volumentmp
-End If
-
-Holding_registers_table(numregvolumen) = Volumentmp
+   Statusrx = 1
+   Print #1 , "MDBGPS RTU BRIDGE 2024"
+   Print #1 , Version(1)
+   Print #1 , Version(2)
+   Print #1 , Version(3)
+   Estado_led = 1
+   Status = 1
 
 
 
+   Coil_status_table(1) = 0
+   Coil_status_table(2) = 0
+   Coil_status_table(3) = 0
+   Coil_status_table(4) = 0
+   Coil_status_table(5) = 0
+
+   For For_loop = 1 To 32
+      Holding_registers_table(for_loop) = For_loop
+      Input_registers_table(for_loop) = For_loop
+   Next For_loop
+
+   Dir_slave = Dir_slave_eep
+   Print #1 , "Dir_Slave=" ; Dir_slave
+
+   Volumentmp = Volumentmpeep
+   Print #1 , "Volumen=" ; Volumentmp
+
+   If Volumentmp > 30 Then
+      Volumentmp = 10
+      Volumentmpeep = Volumentmp
+   End If
+
+   Holding_registers_table(numregvolumen) = Volumentmp
+
+   Msgtmp = Msgtmpeep
+   If Msgtmp > 15 Then
+      Msgtmp = 15
+      Msgtmpeep = Msgtmp
+   End If
+   Holding_registers_table(Numregmsg) = Msgtmp
+   Print #1 , "Número de MSG=" ; Msgtmp
 End Sub
 
 

@@ -9,7 +9,7 @@
 '
 
 
-$version 0 , 1 , 155
+$version 0 , 1 , 163
 $regfile = "m1284pdef.dat"
 $crystal = 7372800
 '$crystal = 8000000
@@ -19,6 +19,7 @@ $baud1 = 9600
 $hwstack = 128
 $swstack = 128
 $framesize = 128
+$projecttime = 2
 
 
 'Declaracion de constantes
@@ -175,6 +176,8 @@ Do
 
       If Cntrtest.0 = 1 Then
          Status = 2
+         Volumen = Volumentst
+         print #1, "VOLtst=";volumen
       Else
          Status = 1
 

@@ -19,7 +19,7 @@
 ' Test    - El Master envia comando de configuracion de Test de Audio y DRVLED
 ' Naranja - El Master envia comando de configuracion de estado de alarma
 
-$version 0 , 1 , 91
+$version 0 , 1 , 98
 $regfile = "m1284pdef.dat"
 $crystal = 16000000
 $baud = 9600
@@ -28,13 +28,15 @@ $baud1 = 9600
 $hwstack = 128
 $swstack = 128
 $framesize = 128
-$projecttime = 74
+$projecttime = 93
 
 
 'Declaracion de constantes
 Const Numregconsulta = 74
 Const Numregvolumen = 75
-Const Numhr = 75
+Const Numregmsg = 76
+Const Numregtxmsg = 77
+Const Numhr = 78
 Const Numipr = 22
 
 Const Numsta = 11                                           'Numero de estaciones
@@ -236,7 +238,36 @@ Do
          Volumentmp = 29
       End If
       Volumentmpeep = Volumentmp
-
    End If
+
+   If Holding_registers_table(numregtxmsg) <> Numregtxmsgtmp Then
+      Print #1 , "Nueva tx msg"
+      Tmpw2 = Holding_registers_table(numregtxmsg)
+      Print #1 , Bin(tmpw2)
+      For J = 1 To 16
+         Tmpb2 = J - 1
+         If Tmpw2.tmpb2 <> Numregtxmsgtmp.tmpb2 Then
+            If Tmpw2.tmpb2 = 1 Then
+               Print #1 , "TxMSG en Esclavo " ; J
+               Print #1 , "$SETMSG," ; J ; "," ; Msgtmp ; "," ; Volumentmp
+
+            Else
+               Print #1 , "no tx msg en esclavo" ; J
+            End If
+         End If
+      Next
+      Numregtxmsgtmp = Holding_registers_table(numregtxmsg)
+   End If
+
+   If Holding_registers_table(numregmsg) <> Msgtmp Then
+      Msgtmp = Holding_registers_table(numregmsg)
+      Print #1 , "Nuevo Mensaje" ; Msgtmp
+      If Msgtmp > 16 Then
+         Msgtmp = 16
+      End If
+      Msgtmpeep = Msgtmp
+   End If
+
+
 
 Loop

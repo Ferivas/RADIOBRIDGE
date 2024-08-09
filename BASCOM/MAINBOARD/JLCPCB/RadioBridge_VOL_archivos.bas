@@ -8,6 +8,7 @@
 '* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 $nocompile
+$projecttime = 27
 
 
 '*******************************************************************************
@@ -17,7 +18,7 @@ Declare Sub Inivar()
 Declare Sub Procser()
 Declare Sub Espera(byval Tespera As Word)
 Declare Sub Gentrama()
-Declare Sub Rxdtmf()                                        'Recibe tonos DTMF
+'Declare Sub Rxdtmf()                                        'Recibe tonos DTMF
 Declare Sub Txdtmf()                                        'Transmite tonos DTMF
 Declare Sub Leersta()
 Declare Sub Leeradc()
@@ -174,7 +175,8 @@ Dim Topi2c(numi2c) As Byte
 Dim Topi2ceep(numi2c) As Eram Byte
 Dim Tmpi2c As Byte
 Dim Tmpcanal As Byte
-
+Dim Newmsg As Bit
+Dim Tmpmsg As Byte
 'Variables SERIAL0
 Dim Ser_ini As Bit , Sernew As Bit
 Dim Numpar As Byte
@@ -271,6 +273,7 @@ Int_timer0:
    If Cntrt0 = 0 Then
       Set Newadc                                            'Ints cada segundo
       Set Newdrv
+      'Set Newmsg
       Incr Cntrseg
       Cntrseg = Cntrseg Mod Tani
       If Cntrseg = 0 Then
@@ -519,24 +522,24 @@ End Sub
 '*******************************************************************************
 ' Subrutina de rx de datos DTMF
 '*******************************************************************************
-Sub Rxdtmf()
+'Sub Rxdtmf()
 
-   If Dv = 1 Then
-      Tonodtmf = Pind
-      Shift Tonodtmf , Right , 4
-      Print #1 , "T=" ; Hex(tonodtmf)
-      Incr Ptrrxdtmf
-      Tbl_rxdtmf(ptrrxdtmf) = Tonodtmf
-      Ptrrxdtmf = Ptrrxdtmf Mod 12
-      If Ptrrxdtmf = 0 Then
-         Print #1 , "rx="
-         For J = 1 To 12
-            Print #1 , J ; "," ; Hex(tbl_rxdtmf(j))
-         Next
-      End If
-   End If
+'   If Dv = 1 Then
+'      Tonodtmf = Pind
+'      Shift Tonodtmf , Right , 4
+'      Print #1 , "T=" ; Hex(tonodtmf)
+'      Incr Ptrrxdtmf
+'      Tbl_rxdtmf(ptrrxdtmf) = Tonodtmf
+'      Ptrrxdtmf = Ptrrxdtmf Mod 12
+'      If Ptrrxdtmf = 0 Then
+'         Print #1 , "rx="
+'         For J = 1 To 12
+'            Print #1 , J ; "," ; Hex(tbl_rxdtmf(j))
+'         Next
+'      End If
+'   End If
 
-End Sub
+'End Sub
 
 
 '*******************************************************************************
@@ -1163,83 +1166,121 @@ Sub Procdtmf()
       Cntrcrcokeep = Cntrcrcok
       Print #1 , Cntrcrcok
 
-      If Tbl_rxhex(1) = Cini And Tbl_rxhex(2) = Idmaster Then
-         Print #1 , "Trama valida"
-         Print #1 , "Volumen=" ; Tbl_rxhex(4)
-         Volumen = Tbl_rxhex(4)
-         If Numestacion = Tmprxdtmf Then
-            Incr Cntrtx
-            Cntrtxeep = Cntrtx
-            Print #1 , "Cntrtx=" ; Cntrtx
-            Call Gentrama()
-            Print #1 , "Trama HEX"
-            For J = 1 To 15
-               Print #1 , Hex(tramatx(j)) ; ",";
-            Next
-            Print #1,
-            'Statusrx = Tbl_rxdtmf(2)
-            If Tmpstatus.3 = 0 Then
-               Reset Modooff
-               Print #1 , "MODOOFF=0," ; Modooff
-               Estado_led = 1
-            Else
-               Set Modooff
-               Print #1 , "MODOOFF=1," ; Modooff
-               Estado_led = 11
-            End If
-            Reset Tmpstatus.3
-            Statusrx = Tmpstatus
-            Print #1 , "STATUS RX=" ; Statusrx
-            Status = Statusrx
-
-            Print #1,
-            Print #1 , "Trama DTMF"
-            Print #1 , "RXDTMF";
-            'Print #2 , "$RXDTMF";
-            For J = 1 To 30
-               Print #1 , "," ; Hex(tramatxdtmf(j)) ;
-               'Print #2 , "," ; Hex(tramatxdtmf(j)) ;
-            Next
-            Print #1,
-            'Print #2,
-            Call Espera(200)
-            Call Txdtmf()
-         Else
-
-            If Tmprxdtmf = &H0F Then
-               Print #1 , "Trama ALARMA"
-               Statusrx = 3
-               Status = 3
-               Estado_led = 3
-               Print #1 , "STATUS RX=" ; Statusrx
-               Reset Modooff
-            Else
-               If Tmprxdtmf = &H0E Then
-                  Print #1 , "Trama TEST"
-                  Statusrx = 2
-                  Status = 2
-                  Estado_led = 2
+      If Tbl_rxhex(1) = Cini Then
+         If Tbl_rxhex(2) = Idmaster Then
+            Print #1 , "Trama valida"
+            Print #1 , "Volumen=" ; Tbl_rxhex(4)
+            Volumen = Tbl_rxhex(4)
+            If Numestacion = Tmprxdtmf Then
+               Incr Cntrtx
+               Cntrtxeep = Cntrtx
+               Print #1 , "Cntrtx=" ; Cntrtx
+               Call Gentrama()
+               Print #1 , "Trama HEX"
+               For J = 1 To 15
+                  Print #1 , Hex(tramatx(j)) ; ",";
+               Next
+               Print #1,
+               'Statusrx = Tbl_rxdtmf(2)
+               If Tmpstatus.3 = 0 Then
                   Reset Modooff
-                  Print #1 , "STATUS RX=" ; Statusrx
+                  Print #1 , "MODOOFF=0," ; Modooff
+                  Estado_led = 1
                Else
-                  If Tmprxdtmf = &H0D Then                  'Trama de vuelta a Normal
-                     Print #1 , "Trama NORMAL"
+                  Set Modooff
+                  Print #1 , "MODOOFF=1," ; Modooff
+                  Estado_led = 11
+               End If
+               Reset Tmpstatus.3
+               Statusrx = Tmpstatus
+               Print #1 , "STATUS RX=" ; Statusrx
+               Status = Statusrx
+
+               Print #1,
+               Print #1 , "Trama DTMF"
+               Print #1 , "RXDTMF";
+               'Print #2 , "$RXDTMF";
+               For J = 1 To 30
+                  Print #1 , "," ; Hex(tramatxdtmf(j)) ;
+                  'Print #2 , "," ; Hex(tramatxdtmf(j)) ;
+               Next
+               Print #1,
+               'Print #2,
+               Call Espera(200)
+               Call Txdtmf()
+            Else
+
+               If Tmprxdtmf = &H0F Then
+                  Print #1 , "Trama ALARMA"
+                  Statusrx = 3
+                  Status = 3
+                  Estado_led = 3
+                  Print #1 , "STATUS RX=" ; Statusrx
+                  Reset Modooff
+               Else
+                  If Tmprxdtmf = &H0E Then
+                     Print #1 , "Trama TEST"
+                     Statusrx = 2
+                     Status = 2
+                     Estado_led = 2
                      Reset Modooff
-                     Statusrx = 1
-                     Status = 1
-                     Estado_led = 1
+                     Print #1 , "STATUS RX=" ; Statusrx
                   Else
-                     If Tmprxdtmf = &H0C Then
-                        Print #1 , "Modo OFF nocturno"
+                     If Tmprxdtmf = &H0D Then                  'Trama de vuelta a Normal
+                        Print #1 , "Trama NORMAL"
+                        Reset Modooff
                         Statusrx = 1
                         Status = 1
-                        Estado_led = 11
-                        Set Modooff
+                        Estado_led = 1
                      Else
-                        Print #1 , "NO es TEST ni alarma . No responde"
+                        If Tmprxdtmf = &H0C Then
+                           Print #1 , "Modo OFF nocturno"
+                           Statusrx = 1
+                           Status = 1
+                           Estado_led = 11
+                           Set Modooff
+                        Else
+                           Print #1 , "NO es TEST ni alarma . No responde"
+                        End If
                      End If
                   End If
                End If
+            End If
+         Else
+            Tmpb = Tbl_rxhex(2) And &HF0
+            If Tmpb = &HF0 Then
+               Print #1 , "Trama MSG val"
+               If Numestacion = Tmprxdtmf Then
+                  Tmpmsg = Tbl_rxhex(2) And &H0F
+                  Print #1 , "MSG=" ; Tmpmsg
+                  Set Newmsg
+                  Print #1 , "Volumen=" ; Tbl_rxhex(4)
+                  Volumen = Tbl_rxhex(4)
+                  Incr Cntrtx
+                  Cntrtxeep = Cntrtx
+                  Print #1 , "Cntrtx=" ; Cntrtx
+                  Call Gentrama()
+                  Print #1 , "Trama HEX"
+                  For J = 1 To 15
+                     Print #1 , Hex(tramatx(j)) ; ",";
+                  Next
+                  Print #1,
+                  Print #1 , "Trama DTMF"
+                  Print #1 , "RXDTMF";
+                  'Print #2 , "$RXDTMF";
+                  For J = 1 To 30
+                     Print #1 , "," ; Hex(tramatxdtmf(j)) ;
+                     'Print #2 , "," ; Hex(tramatxdtmf(j)) ;
+                  Next
+                  Print #1,
+                  'Print #2,
+                  Call Espera(200)
+                  Call Txdtmf()
+               Else
+                  Print #1 , "MSG no para este esclavo"
+               End If
+            Else
+               Print #1 , "Trama no impl"
             End If
          End If
       Else

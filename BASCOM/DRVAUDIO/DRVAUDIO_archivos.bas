@@ -8,7 +8,7 @@
 '* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 $nocompile
-$projecttime = 0
+$projecttime = 46
 
 
 '*******************************************************************************
@@ -25,6 +25,7 @@ Declare Sub Cmddfp(byval Cmd As Byte , Byval Param As Word)
 Declare Sub Espera(byval Tespera As Word)
 Declare Sub Proctest()
 Declare Sub Procalerta()
+Declare Sub Repmsg()
 
 '*******************************************************************************
 'Declaracion de variables
@@ -105,6 +106,9 @@ Dim Loncmd As Byte
 Dim Volumen As Byte
 Dim Volumentst As Byte
 Dim Volumeneep As Eram Byte
+Dim Inimsg As Byte
+Dim Msgtmp As Byte
+Dim Tmpwcmd As Word
 
 'Variables SERIAL0
 Dim Ser_ini As Bit , Sernew As Bit
@@ -480,7 +484,11 @@ Sub Procalerta()
                Print #1 , "SER1=" ; Serproc
                Call Procser()
             End If
-
+            If Leeri2c = 1 Then
+               Reset Leeri2c
+               Print #1 , "READ ADC"
+               Call Rdadc(numcanal)
+            End If
             Tmpw = T0cntr Mod 100
             If Tmpw = 0 Then
                Print #1 , "T0CNTR=" ; T0cntr
@@ -511,12 +519,15 @@ Sub Procalerta()
                   Print #1 , "SER1=" ; Serproc
                   Call Procser()
                End If
-
                If Sernew1 = 1 Then
                   Reset Sernew1
                   Call Procser1()
                End If
-
+               If Leeri2c = 1 Then
+                  Reset Leeri2c
+                  Print #1 , "READ ADC"
+                  Call Rdadc(numcanal)
+               End If
                Tmpw = T0cntr Mod 100
                If Tmpw = 0 Then
                   Print #1 , "T0CNTR=" ; T0cntr
@@ -592,6 +603,114 @@ Sub Cmddfp(byval Cmd As Byte , Byval Param As Word)
       Next
       Print #1,
 
+End Sub
+
+Sub Repmsg()
+   Print #1 , "REP MENSAJE"
+   'Comando para anuncio de modo Alerta Narnaja sola vez
+   Reset Pwrmp3                                          'MOdulo ON
+   Set Ena1
+   'Call Wrdac(255)                                       ' ON amplificador
+   T0rate = 200
+   Reset T0tout
+   T0cntr = 0
+   Set T0ini
+   Do
+
+   Loop Until Sernew1 = 1 Or T0tout = 1
+   Call Procser1()
+   Reset Sernew1
+   'Comando para auncio continuo de modo alerta naranja
+   If Tblser1(4) = &H3F Then
+      Print #1 , "Modulo ON"
+      If Tblser1(7) = &H02 Then
+         Call Wrdac(255)                                    ' ON amplificador
+         Print #1 , "SD OK"
+         Print #1 , "$SETMSG," ; Msgtmp
+         Print #1 , "Vol=" ; Volumen
+         Call Cmddfp(&H06 , Volumen)
+         Tmpwcmd = &H0200 + Msgtmp
+         Print #1 , "CmdMsg=" ; Hex(tmpwcmd)
+         Call Cmddfp(&H0f , Tmpwcmd)
+         Print #1 , "MSG " ; Msgtmp
+         T0rate = 2000
+         Reset T0tout
+         T0cntr = 0
+         Set T0ini
+         Do
+            Datomp3 = Tblser1(4)
+            If Sernew = 1 Then                           'DATOS SERIAL 1
+               Reset Sernew
+               Print #1 , "SER1=" ; Serproc
+               Call Procser()
+            End If
+            If Leeri2c = 1 Then
+               Reset Leeri2c
+               Print #1 , "READ ADC"
+               Call Rdadc(numcanal)
+            End If
+            Tmpw = T0cntr Mod 100
+            If Tmpw = 0 Then
+               Print #1 , "T0CNTR=" ; T0cntr
+            End If
+         Loop Until Datomp3 = &H3D Or T0tout = 1            ' Or Status = 1
+         Print #1 , "Fin MSG"
+         Call Procser1()
+         Print #1 , "REP MSG"
+         Tmpwcmd = &H0200 + Msgtmp
+         Call Cmddfp(&H0f , Tmpwcmd)
+         Call Espera(100)
+         Call Procser1()
+         Call Cmddfp(&H08 , &H0000)                      ' En repeticion
+         Cntrmin = 0
+'         Do
+            T0rate = 600
+            Reset T0tout
+            T0cntr = 0
+            Set T0ini
+            Incr Cntrmin
+            Do
+               If Sernew = 1 Then                           'DATOS SERIAL 1
+                  Reset Sernew
+                  Print #1 , "SER1=" ; Serproc
+                  Call Procser()
+               End If
+               If Sernew1 = 1 Then
+                  Reset Sernew1
+                  Call Procser1()
+               End If
+               If Leeri2c = 1 Then
+                  Reset Leeri2c
+                  Print #1 , "READ ADC"
+                  Call Rdadc(numcanal)
+               End If
+               Tmpw = T0cntr Mod 100
+               If Tmpw = 0 Then
+                  Print #1 , "T0CNTR=" ; T0cntr
+               End If
+            Loop Until T0tout = 1                           'Or Status = 1
+'            Print #1 , "Cntrmin=" ; Cntrmin
+'         Loop Until Cntrmin = 3 'Or Status = 1
+         Call Cmddfp(&H0e , &H0000)
+         Call Espera(100)
+         Call Procser1()
+         Print #1 , "FIN msg"
+         Set Pwrmp3
+'         Status = 1
+      Else
+         Print #1 , "NO SD"
+      End If
+   Else
+     Print #1 , "Modulo NO Presente"
+      Reset Ena1
+      Reset Ena2
+      Call Wrdac(0)                                         ' Silencio amplificador
+      Set Pwrmp3
+      Call Espera(100)
+       'Call Procser1()
+
+      'Set Anaranja
+   End If
 End Sub
 
 
@@ -857,6 +976,22 @@ Sub Procser()
          Case "LEEVOL"
             Cmderr = 0
             Atsnd = "VOL=" + Str(volumen)
+
+         Case "SETMSG"
+            If Numpar = 3 Then
+               Msgtmp = Val(cmdsplit(2))
+               If Msgtmp < Nummsg_masuno Then
+                  Cmderr = 0
+                  Volumen = Val(cmdsplit(3))
+                  Set Inimsg
+                  Atsnd = "Rep. MSG " + Str(msgtmp) + " con Vol " + Str(volumen)
+
+               Else
+                  Cmderr = 5
+               End If
+            Else
+               Cmderr = 4
+            End If
 
 
          Case Else

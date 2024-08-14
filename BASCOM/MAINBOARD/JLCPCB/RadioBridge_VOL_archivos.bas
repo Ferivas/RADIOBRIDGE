@@ -8,7 +8,7 @@
 '* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 $nocompile
-$projecttime = 27
+$projecttime = 33
 
 
 '*******************************************************************************
@@ -1109,6 +1109,24 @@ Sub Procser()
          Case "TMPI2C"
             Cmderr = 0
             Atsnd = "TmpI2C=" + Bin(tmpi2c)
+
+         Case "SETMSG"
+            If Numpar = 3 Then
+               Tmpmsg = Val(cmdsplit(2))
+               If Tmpmsg < Nummsg_masuno Then
+                  Cmderr = 0
+                  Volumen = Val(cmdsplit(3))
+                  Set Newmsg
+                  Set Inileei2c
+                  Atsnd = "Rep. MSG " + Str(tmpmsg) + " con Vol " + Str(volumen)
+
+               Else
+                  Cmderr = 5
+               End If
+            Else
+               Cmderr = 4
+            End If
+
 
          Case Else
             Cmderr = 1

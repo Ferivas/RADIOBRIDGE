@@ -9,7 +9,7 @@
 '
 
 
-$version 0 , 1 , 163
+$version 0 , 1 , 178
 $regfile = "m1284pdef.dat"
 $crystal = 7372800
 '$crystal = 8000000
@@ -19,7 +19,7 @@ $baud1 = 9600
 $hwstack = 128
 $swstack = 128
 $framesize = 128
-$projecttime = 2
+$projecttime = 18
 
 
 'Declaracion de constantes
@@ -29,6 +29,9 @@ Const Pcf8591dacconfig = &B01000000
 
 Const Numcanali2c = 4
 Const Numcanali2c_masuno = Numcanali2c + 1
+
+Const Nummsg = 8
+Const Nummsg_masuno = Nummsg + 1
 
 'Configuracion de entradas/salidas
 Led1 Alias Portb.2                                          'LED ROJO
@@ -165,24 +168,33 @@ Do
 
    If Test = 0 Then
       Print #1 , "TEST por ibutton"
-      Reset Ininormal
+'      Reset Ininormal
+'      Reset Ena1
+'      Reset Ena2
+'      Call Wrdac(0)                                         ' Silencio amplificador
+'      'Comando para silenciar reproduccion de audio
+'      Set Pwrmp3                                            ' off dfp
+'      Incr Cntrtest
+'      If Cntrtest.0 = 1 Then
+'         Status = 2
+'         Volumen = Volumentst
+'         Print #1 , "VOLtst=" ; Volumen
+'      Else
+'         Status = 1
+'      End If
+      Set Inimsg
+      Msgtmp = 10
+   End If
+
+   If Inimsg = 1 Then
+      Reset Inimsg
+      Volumen = Volumentst
+      Print #1 , "Nuevo MSG " ; Msgtmp ; " con Vol " ; Volumen
+      Call Repmsg()
       Reset Ena1
       Reset Ena2
-      Call Wrdac(0)                                         ' Silencio amplificador
-      'Comando para silenciar reproduccion de audio
-      Set Pwrmp3                                            ' off dfp
-
-      Incr Cntrtest
-
-      If Cntrtest.0 = 1 Then
-         Status = 2
-         Volumen = Volumentst
-         print #1, "VOLtst=";volumen
-      Else
-         Status = 1
-
-      End If
-
+      Call Wrdac(0)
+      Set Pwrmp3
    End If
 
 

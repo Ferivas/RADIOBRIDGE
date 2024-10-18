@@ -187,6 +187,12 @@ Se añade comando para reproducir un mensaje pregrababdo en la memoria SD. Este 
 Se añade procesamiento de Holding Register para indicar un envío de comando de tx de mensaje al Master. 
 También se utiliza un Holding Register para alamacenar el valor de Volumen y el Mensaje Pregrabado que se requiere enviar
 
+### CONVERSOR DE TEXTO A VOZ UTILIZADO
+
+https://ttsmaker.com/es
+
+
+
 
 
   

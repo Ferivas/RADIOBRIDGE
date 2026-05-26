@@ -19,9 +19,10 @@
 ' Test    - El Master envia comando de configuracion de Test de Audio y DRVLED
 ' Naranja - El Master envia comando de configuracion de estado de alarma
 
-$version 0 , 1 , 324
+$version 0 , 1 , 325
 '$regfile = "m128def.dat"
-$regfile = "m644pdef.dat"
+'$regfile = "m644pdef.dat"
+$regfile = "m1284pdef.dat"
 $crystal = 7372800
 $baud = 9600
 $baud1 = 9600

@@ -168,11 +168,11 @@ Las entradas analógicas se utilizan para:
   Se implementa funcionalidad para enviar hasta 16 mensajes a los esclavos. Esta función se realiza por medio de la pantalla HDMI, escribiendo en 1L un  bit en un holding register del esclavo (HR 75 ).<br>
   La tarjeta Modbus detecta un cambio en este registro y se encarga de generar un comando para la tarjeta MASTER, la cual realiza la tx hacia el esclavo.
   ### CAMBIOS REALIZADOS EN EL MASTER
-  Se añade un comando para enviar mensajes hacia los esclaovs, para que estos distingan una nueva trama de mensaje y envíen un comando al DRVAUDIO para que reproduzca el mensaje recibido con un volumen configurado también por mensaje. El formato de este comando es <br>
+  Se añade un comando para enviar mensajes hacia los esclavos, para que estos distingan una nueva trama de mensaje y envíen un comando al DRVAUDIO para que reproduzca el mensaje recibido con un volumen configurado también por mensaje. El formato de este comando es <br>
 
   *SETMSG,NumEsclavo,Mensaje,Volumen*
 
-  En donde NumEsclavo es el número de esclavo en ele sistema SAT, El NumMensaje es el mensaje pregrabado almacenado en la menoria SD del DRVAUDIO y Volumen es la variable que permite configurar el volumen del audio.
+  En donde NumEsclavo es el número de esclavo en el sistema SAT, El NumMensaje es el mensaje pregrabado almacenado en la menoria SD del DRVAUDIO y Volumen es la variable que permite configurar el volumen del audio.
   En la trama de tx se cambia el byte 2 de la trama para diferenciar de una trama normal de consulta Tramatx(2) = &H55, por una de valor Tramatx(2) = &HFX , en donde X es un nu´mero hexadecimal que almacena el menaje que se necesita reproducir.
 
 ### CAMBIOS REALIZADOS EN EL RADIOBRIDGE
@@ -182,6 +182,22 @@ Se añade procesamiento de la nueva trama de mensaje generada por el Master, ver
 Se añade comando para reproducir un mensaje pregrababdo en la memoria SD. Este comando tiene la forma <br>
 
 *SETMSG,NumMensaje,Volumen*
+
+Para probar el amplificador por medio del botón de TEST se cambio el mensaje de "Esto es un simulacro, evacúe y dirijase al punto de encuentro", por "Este es un mensaje de prueba del amplificador de audio del Sistema de Alerta Temprana del Parque Nacional Cotopaxi"<br>
+
+El volumen por defecto es 20 , pero se puede cambiar utilizando el comando<br>
+
+*SETVOL,Volumen"*
+
+donde Volumen puede variar de 0 a 30.<br>
+Para leer el valor actual se utiliza<br>
+*LEEVOL*
+
+La tarjeta SD que se utiliza con el reproductor de audio DFPlayer debe grabarse con los datos que see encuentran en esta ubicación
+
+https://github.com/Ferivas/RADIOBRIDGE/tree/main/DOCS/DRVAUDIO
+
+
 
 ### CAMBIOS REALIZADOS EN TARJETA MODBUS
 Se añade procesamiento de Holding Register para indicar un envío de comando de tx de mensaje al Master. 

@@ -9,7 +9,7 @@
 '
 
 
-$version 0 , 1 , 168
+$version 0 , 1 , 183
 $regfile = "m328pBdef.dat"
 $crystal = 16000000
 '$crystal = 8000000
@@ -19,6 +19,7 @@ $baud1 = 9600
 $hwstack = 128
 $swstack = 128
 $framesize = 128
+$projecttime = 30
 
 
 'Declaracion de constantes
@@ -28,6 +29,9 @@ Const Pcf8591dacconfig = &B01000000
 
 Const Numcanali2c = 4
 Const Numcanali2c_masuno = Numcanali2c + 1
+
+Const Nummsg = 11
+Const Nummsg_masuno = Nummsg + 1
 
 'Configuracion de entradas/salidas
 Led1 Alias Portb.2                                          'LED ROJO
@@ -42,23 +46,7 @@ Config Ena1 = Output
 Ena2 Alias Portd.4
 Config Ena2 = Output
 
-'Rstpwr Alias Portd.5
-'Config Rstpwr = Output
 
-'Dout Alias Portd.7
-'Config Dout = Output
-
-'D0 Alias Pinc.4
-'Config D0 = Input
-'Set Portc.4
-
-'D1 Alias Pinc.5
-'Config D1 = Input
-'Set Portc.5
-
-'D2 Alias Pinc.6
-'Config D2 = Input
-'Set Portc.6
 
 Test Alias Pind.2
 Config Test = Input
@@ -103,7 +91,7 @@ Enable Interrupts
 '*******************************************************************************
 '* Archivos incluidos
 '*******************************************************************************
-$include "DRVAUDIO_M328PB_archivos.bas"
+$include "DRVAUDIOMSG_archivos.bas"
 
 'Programa principal
 
@@ -145,10 +133,7 @@ Do
       Reset Ena2
       Call Wrdac(0)                                         ' Silencio amplificador
       'Comando para silenciar reproduccion de audio
-      Set Pwrmp3
-      'Set Rstpwr
-      Waitms 100
-      'Reset Rstpwr                                          ' off dfp
+      Set Pwrmp3                                            ' off dfp
    End If
 
    If Inirespdrv = 1 Then
@@ -160,7 +145,6 @@ Do
 
    If Initest = 1 Then
       Reset Initest
-      Volumen = 20
       Call Proctest()
    End If
 
@@ -171,26 +155,34 @@ Do
 
    If Test = 0 Then
       Print #1 , "TEST por ibutton"
-      Reset Ininormal
-      Reset Ena1
-      Reset Ena2
-      Call Wrdac(0)                                         ' Silencio amplificador
-      'Comando para silenciar reproduccion de audio
-      Set Pwrmp3                                            ' off dfp
-      'Set Rstpwr
-      Waitms 100
-      'Reset Rstpwr
-      Incr Cntrtest
-
-      If Cntrtest.0 = 1 Then
-         Status = 2
-      Else
-         Status = 1
-
-      End If
-
+'      Reset Ininormal
+'      Reset Ena1
+'      Reset Ena2
+'      Call Wrdac(0)                                         ' Silencio amplificador
+'      'Comando para silenciar reproduccion de audio
+'      Set Pwrmp3                                            ' off dfp
+'      Incr Cntrtest
+'      If Cntrtest.0 = 1 Then
+'         Status = 2
+'         Volumen = Volumentst
+'         Print #1 , "VOLtst=" ; Volumen
+'      Else
+'         Status = 1
+'      End If
+      Set Inimsg
+      Msgtmp = 10
    End If
 
+   If Inimsg = 1 Then
+      Reset Inimsg
+      'Volumen = Volumentst
+      Print #1 , "Nuevo MSG " ; Msgtmp ; " con Vol " ; Volumen
+      Call Repmsg()
+      Reset Ena1
+      Reset Ena2
+      Call Wrdac(0)
+      Set Pwrmp3
+   End If
 
    Call Leersta()
 

@@ -371,14 +371,14 @@ Buffram(592) = &B01111110
 
 Estado_led = 2
 
-   Horamin = Horamineep
-   Print #1 , "Last act CLK " ; Date(horamin) ; "," ; Time(horamin)
+   'Horamin = Horamineep
+   'Print #1 , "Last act CLK " ; Date(horamin) ; "," ; Time(horamin)
    'Tmplntp = Syssec(horamin)
-   Tmpstr8 = Time(horamin)
-   Time$ = Tmpstr8
-   Print #1 , "Ts:" ; Tmpstr8 ; " T:" ; Time$
-   Tmpstr8 = Date(horamin)
-   Date$ = Tmpstr8
+   'Tmpstr8 = Time(horamin)
+   'Time$ = Tmpstr8
+   'Print #1 , "Ts:" ; Tmpstr8 ; " T:" ; Time$
+   'Tmpstr8 = Date(horamin)
+   'Date$ = Tmpstr8
    Print #1 , "Ds:" ; Tmpstr8 ; " D:" ; Date$
    Print #1 , "H:" ; Time$ ; " D:" ; Date$
    Tmpsec = Syssec()

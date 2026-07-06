@@ -8,7 +8,7 @@
 '* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 $nocompile
-$projecttime = 47
+$projecttime = 52
 
 
 '*******************************************************************************
@@ -35,6 +35,7 @@ Declare Sub Procmodbusreg()
 Declare Sub Vertout()
 Declare Sub Vercfg()
 Declare Sub Txmsg()
+Declare Sub Cleardtmf()
 
 '*******************************************************************************
 'Declaracion de variables
@@ -1764,6 +1765,14 @@ Sub Procdtmf()
       Print #1 , Cntrcrcbad
    End If
 End Sub
+
+Sub Cleardtmf()
+   For J = 1 To 32
+      Tbl_rxdtmf(j)=0
+   Next
+
+End Sub
+
 
 Sub Proctest()
    Print #1 , "TEST ESTACION No. " ; Statst ; ", ESTADO=" ; Estadotst

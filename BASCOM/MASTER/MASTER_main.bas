@@ -27,7 +27,7 @@
 
 
 
-$version 0 , 1 , 192
+$version 0 , 1 , 194
 $regfile = "m128def.dat"
 $crystal = 16000000
 $baud = 9600
@@ -36,7 +36,7 @@ $baud1 = 9600
 $hwstack = 128
 $swstack = 128
 $framesize = 128
-$projecttime = 157
+$projecttime = 163
 
 
 'Declaracion de constantes
@@ -250,6 +250,7 @@ Do
    If Newdv = 1 Then
       Reset Newdv
       Call Procdtmf()
+      Call Cleardtmf()
    End If
 
    Call Leersta()

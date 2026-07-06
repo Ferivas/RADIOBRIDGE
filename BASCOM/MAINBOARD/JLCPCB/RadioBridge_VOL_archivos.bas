@@ -1268,7 +1268,7 @@ Sub Procdtmf()
             Tmpb = Tbl_rxhex(2) And &HF0
             If Tmpb = &HF0 Then
                Print #1 , "Trama MSG val"
-               If Numestacion = Tmprxdtmf Then
+               If Numestacion = Tmprxdtmf Then      ' Procesamiento para reproduccion de mensajes
                   Tmpmsg = Tbl_rxhex(2) And &H0F
                   Print #1 , "MSG=" ; Tmpmsg
                   Set Newmsg

@@ -8,7 +8,7 @@
 '* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 $nocompile
-$projecttime = 51
+$projecttime = 73
 
 
 '*******************************************************************************
@@ -276,7 +276,7 @@ Sub Inivar()
    Print #1 , "Estado=" ; Status
    Volumentst = Volumeneep
    If Volumentst > 30 Then
-      Volumentst = 30
+      Volumentst = 20
    End If
    Print #1 , "VOLtst=" ; Volumentst
 End Sub
@@ -469,7 +469,9 @@ Sub Procalerta()
          Print #1 , "SD OK"
          Print #1 , "$DRVAUD,3"
          Print #1 , "$DRVAUD,3"                          'NO SD presente
+         Print #1 , "VOL=" ; Volumen                        'NO SD presente
 
+         Call Cmddfp(&H06 , Volumen)
          Call Cmddfp(&H0f , &H0108)
          Print #1 , "Tono Info ALARMA"
 
@@ -651,20 +653,22 @@ Sub Repmsg()
             End If
             Tmpw = T0cntr Mod 100
             If Tmpw = 0 Then
-               Print #1 , "T0CNTR=" ; T0cntr
+               'Print #1 , "T0CNTR=" ; T0cntr
             End If
          Loop Until Datomp3 = &H3D Or T0tout = 1            ' Or Status = 1
          Print #1 , "Fin MSG"
          Call Procser1()
          Print #1 , "REP MSG"
-         Tmpwcmd = &H0200 + Msgtmp
-         Call Cmddfp(&H0f , Tmpwcmd)
-         Call Espera(100)
-         Call Procser1()
-         Call Cmddfp(&H08 , &H0000)                      ' En repeticion
+'         Tmpwcmd = &H0200 + Msgtmp
+'         Call Cmddfp(&H0f , Tmpwcmd)
+'         Call Espera(100)
+'         Call Procser1()
+         'Call Cmddfp(&H08 , &H0000)                      ' En repeticion
+         Call Cmddfp(&H0f , Tmpwcmd)                        ' En repeticion
+         Datomp3 = &H00
          Cntrmin = 0
 '         Do
-            T0rate = 600
+            T0rate = 1000
             Reset T0tout
             T0cntr = 0
             Set T0ini
@@ -686,9 +690,9 @@ Sub Repmsg()
                End If
                Tmpw = T0cntr Mod 100
                If Tmpw = 0 Then
-                  Print #1 , "T0CNTR=" ; T0cntr
+                  'Print #1 , "T0CNTR=" ; T0cntr
                End If
-            Loop Until T0tout = 1                           'Or Status = 1
+            Loop Until T0tout = 1 Or Datomp3 = &H3D         'Or Status = 1
 '            Print #1 , "Cntrmin=" ; Cntrmin
 '         Loop Until Cntrmin = 3 'Or Status = 1
          Call Cmddfp(&H0e , &H0000)
@@ -912,8 +916,9 @@ Sub Procser()
                Case 2:
                   Cmderr = 0
                   Tmpb = Val(cmdsplit(2))
-                  Volumen = 20
+                  '
                   If Tmpb < 4 And Tmpb > 0 Then
+                     Volumen = 20
                      Status = Tmpb
                      Statuseep = Tmpb
                      Atsnd = "Se configuro estado DRVAUD a " + Str(status) + " con VOL=" + Str(volumen)
@@ -924,8 +929,8 @@ Sub Procser()
                Case 3:
                   Cmderr = 0
                   Tmpb = Val(cmdsplit(2))
-                  Volumen = Val(cmdsplit(3))
                   If Tmpb < 4 And Tmpb > 0 Then
+                     Volumen = Val(cmdsplit(3))
                      Status = Tmpb
                      Statuseep = Tmpb
                      Atsnd = "Se configuro estado DRVAUD a " + Str(status) + " con VOL=" + Str(volumen)
@@ -966,7 +971,7 @@ Sub Procser()
 
          Case "LEEVOL"
             Cmderr = 0
-            Atsnd = "VOL=" + Str(volumen)
+            Atsnd = "VOLultimo=" + Str(volumen) + " , VOLtst=" + Str(volumentst)
 
          Case "SETMSG"
             If Numpar = 3 Then

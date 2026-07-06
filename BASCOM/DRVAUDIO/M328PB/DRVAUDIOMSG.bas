@@ -9,7 +9,7 @@
 '
 
 
-$version 0 , 1 , 183
+$version 0 , 1 , 194
 $regfile = "m328pBdef.dat"
 $crystal = 16000000
 '$crystal = 8000000
@@ -19,7 +19,7 @@ $baud1 = 9600
 $hwstack = 128
 $swstack = 128
 $framesize = 128
-$projecttime = 30
+$projecttime = 38
 
 
 'Declaracion de constantes
@@ -154,7 +154,7 @@ Do
    End If
 
    If Test = 0 Then
-      Print #1 , "TEST por ibutton"
+      Print #1 , "TEST por button"
 '      Reset Ininormal
 '      Reset Ena1
 '      Reset Ena2
@@ -171,6 +171,8 @@ Do
 '      End If
       Set Inimsg
       Msgtmp = 10
+      Volumen = Volumentst
+
    End If
 
    If Inimsg = 1 Then

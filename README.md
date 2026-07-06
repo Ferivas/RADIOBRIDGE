@@ -86,9 +86,11 @@ Para leer el valor configurado <br>
 
   ### TRAMAS DE PRUEBA PARA EL MASTER
   Prueba estación 5
-
-### PROGRAMACION CON AVRDUDE
-Si se graba el bootloader URboot en los ATmega, se puede programarlos con un Raspberry donde se instalo avrdude utilizando esta línea de comando
+  
+  $RXDTMF,05,01,00,00,00,00,00,08,00,04,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,02
+  
+### PROGRAMACION CON AVRDUDE TARJETA MODBUS
+Si se graba el bootloader URboot en la tarjeta MDBGPS, se puede programarlos con un Raspberry donde se instalo avrdude utilizando esta línea de comando
 
 *avrdude -p m1284p -c arduino -P /dev/ttyUSB0 -b 57600 -F -D -U flash:w:MBDGPS.hex -v*
 
@@ -97,7 +99,12 @@ En BASCOM se debe programar con Arduino a 57600 como se muestra en la figura sig
 <img width="600" alt="Prog BASCOM" src="https://github.com/Ferivas/RADIOBRIDGE/blob/main/DOCS/Config_Prog_Urboot_M1284P.jpg">
   
 
-  $RXDTMF,05,01,00,00,00,00,00,08,00,04,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,02
+### PROGRAMACION CON AVRDUDE TARJETA MAINBOARD RADIOBRIDGE MASTER
+Para reprogramar el SAT MASTER con avrdude nos ubicamos en [RADIOBRIGE](https://github.com/Ferivas/RADIOBRIDGE/tree/main/BASCOM/MAINBOARD/JLCPCB) y dese ahi ejecutamos el siguiente comando en el Raspberry
+
+
+*avrdude -p m128 -c arduino -P /dev/ttyUSB0 -b 57600 -F -D -U flash:w:MASTER_main.hex -v*
+
 
 ## TARJETA MODBUS
 La tarjeta Modbus permite añadir un interfaz HMI para hacer test y señalizar el estado de las estaciones del SAT.
